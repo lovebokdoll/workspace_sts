@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class MemberVO {
-	private String mem_id = null;
-	private String mem_pw = null;
-	private String mem_name = null;
+	private String mem_id ;
+	private String mem_pw ;
+	private String mem_name ;
 
 
 
