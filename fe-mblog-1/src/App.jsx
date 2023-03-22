@@ -21,15 +21,15 @@ function App({ imageUploader }) {
           element={<HomePage />}
         />
         <Route //
+          path="/dept/:gubun"
+          element={<DeptPage imageUploader={imageUploader} />}
+        />
+        <Route //
           path="/member"
           exact={true}
           element={<MemberPage imageUploader={imageUploader} />}
         />
-        <Route //
-          path="/dept"
-          exact={true}
-          element={<DeptPage />}
-        />
+
         <Route //
           path="/profile"
           exact={true}

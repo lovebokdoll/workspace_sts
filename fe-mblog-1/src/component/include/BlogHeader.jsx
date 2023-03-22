@@ -14,7 +14,7 @@ const BlogHeader = () => {
             <Link to="/home" className="nav-link">
               Home
             </Link>
-            <Link to="/dept" className="nav-link">
+            <Link to="/dept/0" className="nav-link">
               부서관리
             </Link>
             <Link to="/board" className="nav-link">

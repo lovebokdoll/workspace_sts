@@ -9,6 +9,8 @@ const LoginPage = () => {
       <a href={KAKAO_AUTH_URL}>
         <Image src="/images/kakao/kakao_login_medium_wide.png" />
       </a>
+      <br />
+      auth - LoginPage.jsx
     </div>
   );
 };

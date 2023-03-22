@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo">
+	<select id="deptList" parameterType="map" resultType="map">
+		select deptno,dname,loc,filename,fileurl from dept
+		<where>
+			<if test='deptno!=null and deptno>0'>
+				AND deptno = #{deptno}
+			</if>
+			<if test='gubun!=null and gubun.equals("deptno")'>
+				AND deptno LIKE '%'||#{keyword}||'%'
+			</if>
+			<if test='gubun!=null and gubun.equals("dname")'>
+				AND dname LIKE '%'||#{keyword}||'%'
+			</if>
+			<if test='gubun!=null and gubun.equals("loc")'>
+				AND loc LIKE '%'||#{keyword}||'%'
+			</if>
+		</where>
+		order by deptno desc
+	</select>
+
+	<insert id="deptInsert"
+		parameterType="com.example.demo.vo.DeptVO">
+		INSERT INTO dept(deptno,dname,loc
+		<if test="filename != null">
+			, filename
+		</if>
+		<if test="fileurl != null">
+			, fileurl
+		</if>
+		)
+		VALUES(#{deptno},#{dname},#{loc}
+		<if test="filename != null">
+			,#{filename}
+		</if>
+		<if test="fileurl != null">
+			,#{fileurl}
+		</if>
+		)
+	</insert>
+
+	<update id="deptUpdate" parameterType="map">
+		UPDATE dept
+		SET
+		dname =#{dname},
+		loc=#{loc}
+		<where>
+			<if test='deptno!=null and deptno>0'>
+				AND deptno = #{deptno}
+			</if>
+		</where>
+	</update>
+
+	<delete parameterType="int" id="deptDelete">
+		DELETE from dept
+		<where>
+			<if test="deptno!=null and deptno > 0">AND deptno = #{value} </if>
+		</where>
+	</delete>
+
+</mapper>
