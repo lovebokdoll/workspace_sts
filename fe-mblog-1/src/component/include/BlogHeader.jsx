@@ -17,7 +17,7 @@ const BlogHeader = () => {
             <Link to="/dept/0" className="nav-link">
               부서관리
             </Link>
-            <Link to="/board" className="nav-link">
+            <Link to="/repleboard" className="nav-link">
               게시판
             </Link>
           </Nav>

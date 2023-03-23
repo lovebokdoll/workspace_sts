@@ -4,11 +4,23 @@ import { useBootstrapBreakpoints } from "react-bootstrap/esm/ThemeProvider";
 import { useNavigate, useParams } from "react-router-dom";
 import { deptInserDB, deptInsertDB, deptListDB } from "../../service/dbLogic";
 import { validateDname } from "../../service/validateLogic";
-import "../css/style.css";
+import styled from "styled-components";
 import DeptRow from "../dept/DeptRow";
+import BlogFooter from "../include/BlogFooter";
 import BlogHeader from "../include/BlogHeader";
 import { MyInput, MyLabel, MyLabelAb } from "../style/FormStyle";
 
+const DivUploadImage = styled.div`
+  display: flex;
+  width: 500px;
+  height: 400px;
+  overflow: hidden;
+`;
+const Img = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
 const DeptPage = ({ imageUploader }) => {
   //화면 전환시나 가급적 전체페이지 리로딩을 하지 않음
   //navigate훅을 사용하면 됨
@@ -77,10 +89,10 @@ const DeptPage = ({ imageUploader }) => {
     const asyncDB = async () => {
       const res = await deptListDB({ gubun, keyword, deptno: 0 });
       console.log(res.data);
-      if (res.data) {
-        setDeptList(res.data);
-      } else {
+      if (!res.data) {
         console.log("부서조건목록 조회실패");
+      } else {
+        setDeptList(res.data);
       }
     };
     asyncDB();
@@ -98,8 +110,11 @@ const DeptPage = ({ imageUploader }) => {
     }
   };
   useEffect(() => {
-    deptInsertDB();
-  }, []); //의존성배열이 빈 배열이면 최초 한번만 => 값이 넘어오면 새로고침 되지 않음
+    jsondeptList();
+  }, []);
+  // useEffect(() => {
+  //   deptInsertDB();
+  // }, []); //의존성배열이 빈 배열이면 최초 한번만 => 값이 넘어오면 새로고침 되지 않음
   //의존성배열에 올 수 있는 변수는 전역변수만 가능
 
   //이미지 파일첨부
@@ -152,9 +167,7 @@ const DeptPage = ({ imageUploader }) => {
       navigate("/dept/1");
     }
   };
-  useEffect(() => {
-    jsondeptList();
-  }, [gubun]);
+
   return (
     <>
       <BlogHeader />
@@ -290,13 +303,9 @@ const DeptPage = ({ imageUploader }) => {
                 onChange={imgChange}
               />
             </Form.Group>
-            <div id="uploadImg">
-              <img
-                className="thumbNail"
-                src="http://via.placeholder.com/200X250"
-                alt="미리보기"
-              />
-            </div>
+            <DivUploadImage id="uploadImg">
+              <Img src="http://via.placeholder.com/200X250" alt="미리보기" />
+            </DivUploadImage>
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -309,6 +318,7 @@ const DeptPage = ({ imageUploader }) => {
         </Modal.Footer>
       </Modal>
       {/* ========================== [[ 부서등록 Modal ]] ========================== */}
+      <BlogFooter />
     </>
   );
 };

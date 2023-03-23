@@ -41,14 +41,15 @@ public class RestDeptController {
 		return String.valueOf(result);
 		
 	}
-	@PutMapping("deptUpdate")
+	
+	@PostMapping("deptUpdate")
 	public String deptUpdate(@RequestBody DeptVO pdVO) {
 		logger.info(pdVO.toString());
 		int result= deptLogic.deptUpdate(pdVO);
 		return String.valueOf(result);
 	}
 	
-	@DeleteMapping("deptDelete")
+	@GetMapping("deptDelete")
 	public String deptDelete(int deptno) {
 		logger.info("deptno = "+ deptno );
 		logger.info("사용자가 선택한 부서번호 - 단 자손이 없어야 한다.");

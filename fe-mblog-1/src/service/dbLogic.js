@@ -59,3 +59,33 @@ export const deptInsertDB = (dept) => {
     }
   });
 };
+export const deptUpdateDB = (dept) => {
+  return new Promise((resolve, reject) => {
+    console.log(dept);
+    try {
+      const response = axios({
+        method: "post", //@RequestBody
+        url: process.env.REACT_APP_SPTING_IP + "dept/deptUpdate",
+        data: dept, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const deptDeleteDB = (member) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "get",
+        url: process.env.REACT_APP_SPTING_IP + "dept/deptDelete",
+        params: member,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};

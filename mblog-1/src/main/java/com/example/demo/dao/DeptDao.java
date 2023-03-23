@@ -25,6 +25,11 @@ public class DeptDao {
 	private SqlSessionTemplate sqlSessionTemplate = null;
 	
 	public int deptInsert(DeptVO pdVO) {
+		/**
+		 * sqlSessionTemplate.insert("deptInsert",pdVO); 
+		 * 메소드는 deptInsert라는 SQL쿼리문을 실행하는데 도움을 준다.
+		 * 이때 pdVO라는 파라미터를 전달한다.
+		 */
 		int result = sqlSessionTemplate.insert("deptInsert",pdVO);
 		return result;
 	}

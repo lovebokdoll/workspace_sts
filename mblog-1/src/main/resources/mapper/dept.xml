@@ -20,10 +20,13 @@
 		</where>
 		order by deptno desc
 	</select>
-
+	<!--MyBatis에서 제공하는 XML기반의 SQL매핑구문중 하나로 이것을 활용하여 DB에 INSERT할 수 있다. parameterType 
+		속성은 파라미터의 자료형을 전달한다. 이 insert의 경우 DeptVO라는 클래스를 파라미터로 전달한다. =>이 클래스의 인스턴스를 
+		쿼리문의 파라미터로 전달!! -->
 	<insert id="deptInsert"
 		parameterType="com.example.demo.vo.DeptVO">
 		INSERT INTO dept(deptno,dname,loc
+		<!-- mybatis null???null 값이 들어가도 가능 -->
 		<if test="filename != null">
 			, filename
 		</if>
@@ -42,10 +45,16 @@
 	</insert>
 
 	<update id="deptUpdate" parameterType="map">
-		UPDATE dept
+		UPDATE SCOTT.DEPT
 		SET
-		dname =#{dname},
-		loc=#{loc}
+		DNAME = #{dname},
+		LOC = #{loc}
+		<if test="filename != null">
+			,FILENAME = #{filename}
+		</if>
+		<if test="fileurl != null">
+			,FILEURL = #{fileurl}
+		</if>
 		<where>
 			<if test='deptno!=null and deptno>0'>
 				AND deptno = #{deptno}
