@@ -3,6 +3,7 @@ import LoginPage from "./component/auth/LoginPage";
 import DeptDetail from "./component/dept/DeptDetail";
 import KakaoRedirectHandler from "./component/kakao/KakaoRedirectHandler";
 import Profile from "./component/kakao/Profile";
+import Signup from "./component/member/Signup";
 import DeptPage from "./component/page/DeptPage";
 import HomePage from "./component/page/HomePage";
 import MemberPage from "./component/page/MemberPage";
@@ -21,6 +22,11 @@ function App({ imageUploader }) {
           path="/home"
           exact={true}
           element={<HomePage />}
+        />
+        <Route //
+          path="/member/signup"
+          exact={true}
+          element={<Signup />}
         />
         <Route //
           path="/repleboard"

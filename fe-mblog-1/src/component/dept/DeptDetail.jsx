@@ -131,8 +131,9 @@ const DeptDetail = ({ imageuploader }) => {
       const res = await deptListDB({ deptno: deptno });
       console.log(res.data); //0번방에 뭐가 있는지 찍어봄
       const result = JSON.stringify(res.data);
+      console.log(result);
       const jsonDoc = JSON.parse(result);
-      // console.log(jsonDoc[0].LOC)
+       console.log(jsonDoc)
       setDept({
         DEPTNO: jsonDoc[0].DEPTNO,
         DNAME: jsonDoc[0].DNAME,

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { jsonMemberListDB, memberListDB } from "../../service/dbLogic";
+import { memberListDB } from "../../service/dbLogic";
 
 const MemberPage = ({ imageUploader }) => {
   const [member, setMember] = useState({});
   useEffect(() => {
     const memberList = async () => {
-      const res = await jsonMemberListDB(member);
+      const res = await memberListDB(member);
       console.log(res.data);
     };
     memberList();

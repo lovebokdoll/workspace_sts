@@ -5,7 +5,7 @@
 	<select id="deptList" parameterType="map" resultType="map">
 		select deptno,dname,loc,filename,fileurl from dept
 		<where>
-			<if test='deptno!=null and deptno>0'>
+			<if test='deptno!=null and deptno>0'> 
 				AND deptno = #{deptno}
 			</if>
 			<if test='gubun!=null and gubun.equals("deptno")'>

@@ -5,7 +5,53 @@ export const memberListDB = (member) => {
     try {
       const response = axios({
         method: "get",
-        url: process.env.REACT_APP_SPTING_IP + "member/jsonemberList",
+        url: process.env.REACT_APP_SPTING_IP + "member/memberList",
+        params: member,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const memberInsertDB = (member) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "post", //@RequestBody
+        url: process.env.REACT_APP_SPTING_IP + "member/memberInsert",
+        data: member, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const memberUpdateDB = (member) => {
+  return new Promise((resolve, reject) => {
+    console.log(member);
+    try {
+      const response = axios({
+        method: "post", //@RequestBody
+        url: process.env.REACT_APP_SPTING_IP + "member/memberUpdate",
+        data: member, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const memberDeleteDB = (member) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "get",
+        url: process.env.REACT_APP_SPTING_IP + "member/memberDelete",
         params: member,
       });
       resolve(response);
@@ -30,21 +76,6 @@ export const deptListDB = (dept) => {
   });
 };
 
-export const jsonMemberListDB = (member) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const response = axios({
-        method: "get",
-        url: process.env.REACT_APP_SPTING_IP + "member/jsonMemberListDB",
-        params: member,
-      });
-      resolve(response);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
 export const deptInsertDB = (dept) => {
   return new Promise((resolve, reject) => {
     try {
@@ -59,6 +90,7 @@ export const deptInsertDB = (dept) => {
     }
   });
 };
+
 export const deptUpdateDB = (dept) => {
   return new Promise((resolve, reject) => {
     console.log(dept);
@@ -75,13 +107,13 @@ export const deptUpdateDB = (dept) => {
   });
 };
 
-export const deptDeleteDB = (member) => {
+export const deptDeleteDB = (dept) => {
   return new Promise((resolve, reject) => {
     try {
       const response = axios({
         method: "get",
         url: process.env.REACT_APP_SPTING_IP + "dept/deptDelete",
-        params: member,
+        params: dept,
       });
       resolve(response);
     } catch (error) {
