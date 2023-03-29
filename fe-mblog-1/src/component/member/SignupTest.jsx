@@ -1,10 +1,12 @@
+/*global daum*/
 import { useCallback, useState } from "react";
+import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { memberInsertDB } from "../../service/dbLogic";
 import { BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
 
 //회원가입페이지
-const Signup = () => {
+const SignupTest = () => {
   const navigate = useNavigate("");
   const [mem_uid, setMemuid] = useState("");
   const [mem_pw, setMempw] = useState("");
@@ -14,6 +16,15 @@ const Signup = () => {
   const [mem_tel, setMemtel] = useState("");
   const [mem_gender, setMemgender] = useState("");
   const [mem_birthday, setMembirthday] = useState("");
+  const [mem_zipcode, setMemzipcode] = useState("");
+  const [mem_addr, setMemaddr] = useState("");
+  const [mem_addr_dtl, setMemaddrdtl] = useState("");
+  const [post, setPost] = useState({
+    zipcode: "",
+    addr: "",
+    addrDetail: "",
+  });
+
   //post,@RequestBody ,{} ->비동기처리 ->Promise(resolve,reject)
   const memberInsert = async () => {
     const member = {
@@ -25,7 +36,11 @@ const Signup = () => {
       mem_tel,
       mem_gender,
       mem_birthday,
+      mem_zipcode,
+      mem_addr,
+      mem_addr_dtl,
     };
+    console.log(member);
     const res = await memberInsertDB(member);
     if (!res.data) {
       console.log("회원가입에 실패하였습니다.");
@@ -58,7 +73,36 @@ const Signup = () => {
   const handleBirthday = useCallback((e) => {
     setMembirthday(e);
   }, []);
-
+  const handleZipcode = useCallback((e) => {
+    setMemzipcode(e);
+  }, []);
+  const handleAddr = useCallback((e) => {
+    setMemaddr(e);
+  }, []);
+  const handleAddrdtl = useCallback((e) => {
+    setMemaddrdtl(e);
+  }, []);
+  const clickAddr = (e) => {
+    e.preventDefault();
+    new daum.Postcode({
+      oncomplete: function (data) {
+        let addr = "";
+        if (data.userSelectedType === "R") {
+          addr = data.roadAddress; //도로명
+        } else {
+          addr = data.jibunAddress; //지번
+        }
+        console.log(data); //전체주소정보
+        console.log(addr); //주소정보만
+        setPost({ ...post, zipcode: data.zonecode, addr: addr });
+        document.querySelector("#mem_zipcode").value = data.zonecode; //화면에 자동으로 입력처리
+        document.querySelector("#mem_addr").value = addr;
+        document.querySelector("#mem_addr_dtl").focus(); //addr이 입력되었을때
+        setMemzipcode(document.querySelector("#mem_zipcode").value);
+        setMemaddr(document.querySelector("#mem_addr").value);
+      },
+    }).open();
+  };
   return (
     <>
       <ContainerDiv>
@@ -74,7 +118,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>아이디</h4>
+              <span>아이디</span>
             </div>
             <input
               id="mem_uid"
@@ -98,7 +142,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>비밀번호</h4>
+              <span>비밀번호</span>
             </div>
             <input
               id="mem_pw"
@@ -135,10 +179,10 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>이름</h4>
+              <span>이름</span>
             </div>
             <input
-              id="mam_name"
+              id="mem_name"
               type="text"
               maxLength="50"
               placeholder="이름을 입력하세요."
@@ -159,7 +203,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>닉네임</h4>
+              <span>닉네임</span>
             </div>
             <input
               id="mem_nickname"
@@ -183,7 +227,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>💌이메일</h4>
+              <span>💌이메일</span>
             </div>
             <input
               id="mem_email"
@@ -207,7 +251,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>전화번호</h4>
+              <span>전화번호</span>
             </div>
             <input
               id="mem_tel"
@@ -231,7 +275,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>성별</h4>
+              <span>성별</span>
             </div>
             <input
               id="mem_gender"
@@ -255,7 +299,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>생년월일</h4>
+              <span>생년월일</span>
             </div>
             <input
               id="mem_birthday"
@@ -279,7 +323,7 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>우편번호</h4>
+              <span>우편번호</span>
             </div>
             <input
               id="mem_zipcode"
@@ -292,6 +336,9 @@ const Signup = () => {
                 border: "1px solid lightGray",
                 marginBottom: "5px",
               }}
+              onChange={(e) => {
+                handleZipcode(e.target.value);
+              }}
             />
             <div
               style={{
@@ -300,26 +347,56 @@ const Signup = () => {
                 marginBottom: "5px",
               }}
             >
-              <h4>주소</h4>
+              <span>주소</span>
             </div>
             <input
               id="mem_addr"
               type="text"
               maxLength="50"
               placeholder="주소를 입력하세요."
+              readOnly={post.addr ? false : true}
               style={{
                 width: "200px",
                 height: "40px",
                 border: "1px solid lightGray",
                 marginBottom: "5px",
               }}
+              onChange={(e) => {
+                handleAddr(e.target.value);
+              }}
             />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "5px",
+              }}
+            >
+              <span>상세주소</span>
+            </div>
+            <input
+              id="mem_addr_dtl"
+              type="text"
+              maxLength="50"
+              placeholder="상세주소를 입력하세요."
+              readOnly={post.addr ? false : true}
+              style={{
+                width: "200px",
+                height: "40px",
+                border: "1px solid lightGray",
+                marginBottom: "5px",
+              }}
+              onChange={(e) => {
+                handleAddrdtl(e.target.value);
+              }}
+            />
+            <Button onClick={clickAddr}>주소검색</Button>
+            <BButton onClick={memberInsert}>가입</BButton>
           </div>
-          <BButton onClick={memberInsert}>가입</BButton>
         </FormDiv>
       </ContainerDiv>
     </>
   );
 };
 
-export default Signup;
+export default SignupTest;
