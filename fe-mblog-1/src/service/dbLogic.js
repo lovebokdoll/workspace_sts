@@ -121,3 +121,11 @@ export const deptDeleteDB = (dept) => {
     }
   });
 };
+
+export const boardInsertDB = (bm_no) => {
+
+};
+
+export const uploadImageDB = () => {
+  
+};

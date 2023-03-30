@@ -17,7 +17,7 @@ import {
 
 const KhLoginPage = ({ authLogic }) => {
   const navigate = useNavigate();
-  console.log("LoginPage");
+  //console.log("LoginPage");
   const auth = authLogic.getUserAuth();
   const [submitBtn, setSubmitBtn] = useState({
     disabled: true,
@@ -88,8 +88,8 @@ const KhLoginPage = ({ authLogic }) => {
         "member",
         JSON.stringify({ mem_id: "test", mem_pw: "123" })
       );
-
       navigate("/"); //Routh path="/"
+      window.location.reload();
     } catch (error) {
       console.log(error + ":로그인에러입니다.");
     }
@@ -103,7 +103,7 @@ const KhLoginPage = ({ authLogic }) => {
         authLogic.getGoogleAuthProvider()
       );
       console.log(result.data);
-      // navigate("/");
+      navigate("/");
       // window.location.reload();
     } catch (error) {
       console.log(error + "로그인오류입니다");
@@ -176,7 +176,7 @@ const KhLoginPage = ({ authLogic }) => {
         <MyP style={{ marginTop: "30px" }}>
           신규 사용자이신가요?&nbsp;
           <Link
-            to="/login/signup"
+            to="/auth/signup"
             className="text-decoration-none"
             style={{ color: "blue" }}
           >
@@ -186,7 +186,7 @@ const KhLoginPage = ({ authLogic }) => {
         <MyP>
           이메일를 잊으셨나요?&nbsp;
           <Link
-            to="/login/findEmail"
+            to="/auth/findEmail"
             className="text-decoration-none"
             style={{ color: "blue" }}
           >
@@ -196,7 +196,7 @@ const KhLoginPage = ({ authLogic }) => {
         <MyP>
           비밀번호를 잊으셨나요?&nbsp;
           <Link
-            to="/login/resetPwd"
+            to="/auth/resetPwd"
             className="text-decoration-none"
             style={{ color: "blue" }}
           >

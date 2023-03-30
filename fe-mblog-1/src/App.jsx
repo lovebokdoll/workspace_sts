@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import EmailVerifiedPage from "./component/auth/EmailVerifiedPage";
+import FindEmailPage from "./component/auth/FindEmailPage";
 import KhLoginPage from "./component/auth/KhLoginpage";
-import LoginPage from "./component/auth/LoginPage";
+import ResetPwdPage from "./component/auth/ResetPwdPage";
 import SignupPage from "./component/auth/SignupPage";
 import DeptDetail from "./component/dept/DeptDetail";
 import KakaoRedirectHandler from "./component/kakao/KakaoRedirectHandler";
@@ -11,8 +13,9 @@ import DeptPage from "./component/page/DeptPage";
 import HomePage from "./component/page/HomePage";
 import MemberPage from "./component/page/MemberPage";
 import RepleBoardPage from "./component/page/RepleBoardPage";
+import RepleBoardDetail from "./component/repleboard/RepleBoardDetail";
+import RepleBoardWriteForm from "./component/repleboard/RepleBoardWriteForm";
 import Toast from "./component/Toast";
-import { setToastMsg } from "./redux/toastStatus/action";
 import { onAuthChange } from "./service/authLogic";
 import { memberListDB } from "./service/dbLogic";
 
@@ -34,24 +37,31 @@ function App({ authLogic, imageUploader }) {
       if (user) {
         console.log("user정보가 있을 때");
         ssg.setItem("email", user.email); //담기
-        const res = await memberListDB({ MEM_ID: user.uid, type: "auth" });
+        const res = await memberListDB({ mem_uid: user.uid, type: "auth" });
+        console.log(res.data);
         //오라클 서버의 회원집합에 uid가 존재하면 - 세션스토리지에 값을 담자
-        if (res.data) {
+        if (res.data !== 0) {
+          //스프링부트에서 RestMamberController - memberList에서 넘어오는 정보
+          // 1)0이거나 2)[{mem_uid...}]
           const temp = JSON.stringify(res.data);
           const jsonDoc = JSON.parse(temp);
           ssg.setItem("nickname", jsonDoc[0].MEM_NICKNAME);
           ssg.setItem("status", jsonDoc[0].MEM_STATUS);
           ssg.setItem("auth", jsonDoc[0].MEM_AUTH);
           ssg.setItem("no", jsonDoc[0].MEM_NO);
-          navigate("/");
+          //navigate("/");
           return; //랜더링이 종료됨
         }
         //구글로그인을 했지만 false일 때
-        // if(){
-
-        // }
+        if (!user.emailVerified) {
+          navigate("./auth/emailVerified");
+        }
         //오라클 서버의 회원집합에 uid가 존재하지 않으면
         else {
+          console.log(
+            "해당 구글계정은 회원가입 대상입니다. 회원가입을 해주세요"
+          );
+          navigate("/auth/signup");
         }
       }
       //사용자 정보가 없을 때
@@ -63,6 +73,7 @@ function App({ authLogic, imageUploader }) {
         }
       } //end of else
     };
+    asyncDB();
   }, [dispatch]);
   return (
     <>
@@ -85,9 +96,39 @@ function App({ authLogic, imageUploader }) {
             element={<SignupPage authLogic={authLogic} />}
           />
           <Route //
-            path="/repleboard"
+            path="/auth/emailVerified"
+            exact={true}
+            element={<EmailVerifiedPage authLogic={authLogic} />}
+          />
+          <Route //
+            path="/auth/findemail"
+            exact={true}
+            element={<FindEmailPage />}
+          />
+          <Route //
+            path="/auth/resetPwd"
+            exact={true}
+            element={<ResetPwdPage authLogic={authLogic} />}
+          />
+          <Route //
+            path="/reple/board"
             exact={true}
             element={<RepleBoardPage />}
+          />
+
+          <Route //
+            path="/reple/boarddetail/*"
+            exact={true}
+            element={<RepleBoardDetail />}
+          />
+          <Route //
+            path="/reple/boarddetail/:bm_no"
+            element={<RepleBoardDetail />}
+          />
+          <Route //
+            path="/reple/boardwrite"
+            exact={true}
+            element={<RepleBoardWriteForm />}
           />
           <Route //
             path="/dept/:gubun"

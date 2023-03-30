@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo">
+	<select id="boardList" parameterType="java.util.HashMap"
+		resultType="map">
+		SELECT
+				Q.QNA_BNO
+				,Q.QNA_TITLE
+				,Q.QNA_CONTENT
+				, M.MEM_NAME
+				,Q.QNA_TYPE
+				,Q.QNA_DATE
+		FROM QNA q, MEMBER230324 m
+		WHERE q.MEM_NO = m.MEM_NO
+	</select>
+
+</mapper>

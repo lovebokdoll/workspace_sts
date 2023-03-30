@@ -64,6 +64,7 @@ public class RestMemberController {
 		if (memberList.size() > 0) {
 			Gson gson = new Gson();
 			temp = gson.toJson(memberList);
+			//mem_uid가 없을 때 - 회원가입 유도할 것
 		} else {
 			temp = "0";
 		}

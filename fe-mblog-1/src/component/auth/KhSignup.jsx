@@ -201,8 +201,6 @@ const KhSignup = ({ authLogic }) => {
 
     if (jsonDoc) {
       console.log(jsonDoc[0].MEM_NAME);
-    } else if (jsonDoc[0].MEM_NAME.trim() === "") {
-      console.log("공백");
     } else {
       console.log("입력한 닉네임이 존재하지 않습니다.");
     }
@@ -294,11 +292,12 @@ const KhSignup = ({ authLogic }) => {
         MEM_BIRTHDAY: birthday,
         MEM_TEL: memInfo.hp,
         MEM_NICKNAME: memInfo.nickname,
-        MEM_ZIPCODE: post.postNum,
-        MEM_ADDR: post.post,
-        MEM_ADDR_DTL: post.postDetail,
-        MEM_AUTH: type === "member" ? 1 : 2,
+        MEM_ZIPCODE: post.zipcode,
+        MEM_ADDR: post.addr,
+        MEM_ADDR_DTL: post.addrDetail,
+        MEM_AUTH: type === "member" ? "member" : "teacher",
         MEM_GENDER: memInfo.gender,
+        MEM_STATUS: 1,
       };
       console.log(datas);
       const response = await memberInsertDB(datas);
@@ -380,14 +379,7 @@ const KhSignup = ({ authLogic }) => {
                     />
                     <MyLabelAb>{comment.email}</MyLabelAb>
                   </MyLabel>
-                  <MyButton
-                    type="button"
-                    onClick={() => {
-                      overlap("email");
-                    }}
-                  >
-                    중복확인
-                  </MyButton>
+
                 </div>
               )}
               <div style={{ display: "flex" }}>

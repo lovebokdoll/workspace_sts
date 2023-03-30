@@ -8,7 +8,7 @@ const HomePage = () => {
   const member = window.localStorage.getItem("member");
   console.log(JSON.parse(member));
   const jsonDoc = JSON.parse(member);
-  console.log(jsonDoc.mem_id + "," + jsonDoc.mem_pw);
+  //console.log(jsonDoc.mem_id + "," + jsonDoc.mem_pw);
   const navigete = useNavigate();
   const handleLogin = () => {
     console.log("로그인으로 이동");
