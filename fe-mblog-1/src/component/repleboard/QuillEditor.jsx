@@ -2,13 +2,9 @@ import { useCallback, useEffect, useMemo } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import { uploadImageDB } from "../../service/dbLogic";
 //import 'react-quill/dist/quill.snow.css';
-const QuillEditor = ({
-  value,
-  handleContent,
-  quillRef,
-  files,
-}) => {
+const QuillEditor = ({ value, handleContent, quillRef, files }) => {
   console.log(files);
+  console.log(Array.isArray(files));
   //const dispatch = useDispatch();
   const imageHandler = useCallback(() => {
     console.log(files);
@@ -33,19 +29,20 @@ const QuillEditor = ({
       ) {
         console.log("jpg png jpeg형식만 지원합니다.");
       }
-      formData.append("image", file); // 위에서 만든 폼데이터에 이미지 추가
+      formData.append("image", file); // 위에서 만든 폼데이터에 이미지 추가 - 415
       for (let pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
       // 폼데이터를 서버에 넘겨 multer로 이미지 URL 받아오기
       const res = await uploadImageDB(formData);
-      console.log(res.data); //
+      files.push = res.data;
+      console.log(res.data);
       if (!res.data) {
         console.log("이미지 업로드에 실패하였습니다.");
       }
       const url =
-        process.env.REACT_APP_PUBLIC_URL +
-        `board3/imageGet.st3?imageName=${files[0]}`;
+        process.env.REACT_APP_SPTING_IP +
+        `reple/imageGet?imageName=${res.data}`;
       const quill = quillRef.current.getEditor();
       /* ReactQuill 노드에 대한 Ref가 있어야 메서드들을 호출할 수 있으므로
             useRef()로 ReactQuill에 ref를 걸어주자.
@@ -92,9 +89,9 @@ const QuillEditor = ({
           image: imageHandler,
         },
       },
-      ImageResize: {
-        modules: ["Resize"],
-      },
+      // ImageResize: {
+      //   modules: ["Resize"],
+      // },
     }),
     [imageHandler]
   );

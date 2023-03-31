@@ -1,12 +1,12 @@
 import React from "react";
 import { Button, Table } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import BlogFooter from "../include/BlogFooter";
 import BlogHeader from "../include/BlogHeader";
 
 const RepleBoardPage = () => {
-  const boardSearch = () => {
-    
-  };
+  const navigate = useNavigate();
+  const boardSearch = () => {};
   return (
     <>
       <BlogHeader />
@@ -68,7 +68,12 @@ const RepleBoardPage = () => {
           <div className="booklist-footer">
             <Button variant="warning">전체조회</Button>
             &nbsp;
-            <Button variant="success">글쓰기</Button>
+            <Button
+              variant="success"
+              onClick={() => navigate("/reple/boardwrite")}
+            >
+              글쓰기
+            </Button>
           </div>
         </div>
       </div>

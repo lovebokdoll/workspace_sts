@@ -1,5 +1,46 @@
 import axios from "axios";
 
+export const uploadFileDB = (file) => {
+  console.log(file);
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "post",
+        url: process.env.REACT_APP_SPTING_IP + "reple/fileUpload",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        processData: false,
+        contentType: false,
+        data: file,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+export const uploadImageDB = (file) => {
+  console.log(file);
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "post",
+        url: process.env.REACT_APP_SPTING_IP + "reple/imageUpload",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        processData: false,
+        contentType: false,
+        data: file,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 export const memberListDB = (member) => {
   return new Promise((resolve, reject) => {
     try {
@@ -122,10 +163,4 @@ export const deptDeleteDB = (dept) => {
   });
 };
 
-export const boardInsertDB = (bm_no) => {
-
-};
-
-export const uploadImageDB = () => {
-  
-};
+export const boardInsertDB = (bm_no) => {};

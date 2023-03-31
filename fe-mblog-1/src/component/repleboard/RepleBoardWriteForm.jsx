@@ -1,8 +1,13 @@
 import React, { useCallback, useRef, useState } from "react";
-import {  useNavigate } from "react-router-dom";
-import { boardInsertDB, uploadImageDB } from "../../service/dbLogic";
-import {  BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
+import { useNavigate } from "react-router-dom";
+import {
+  boardInsertDB,
+  uploadFileDB,
+  uploadImageDB,
+} from "../../service/dbLogic";
+import { BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
 import QuillEditor from "./QuillEditor";
+import RepleBoardFileInsert from "./RepleBoardFileInsert";
 const RepleBoardWriteForm = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -12,6 +17,8 @@ const RepleBoardWriteForm = () => {
   const [bsfile, setBsFile] = useState("");
   const [bssize, setBsSize] = useState("");
   const [fileName, setFileName] = useState("");
+  //QuillEditor이미지 선택하면 imageUploadDB타면 스프링프로젝트 pds이미지 업로드
+  //pds에 업로드된 파일을 읽어서 Editor안에 보여줌 imageGet?imageName=woman1.png
   const [files, setFiles] = useState([]);
   const quillRef = useRef();
   const fileRef = useRef();
@@ -37,8 +44,8 @@ const RepleBoardWriteForm = () => {
       bs_file: bsfile,
       bs_size: bssize,
     };
-    const res = await boardInsertDB(board);
-    console.log(res);
+    //   const res = await boardInsertDB(board);
+    // console.log(res);
     //window.location.replace("/board")
     navigate("/board");
   };
@@ -58,14 +65,15 @@ const RepleBoardWriteForm = () => {
     //선택한 파일을 url로 바꾸기 위해 서버로 전달할 폼데이터 만들기
     const formData = new FormData();
     const file = document.querySelector("#file-input").files[0];
-    formData.append("application", file);
-    const res = await uploadImageDB(formData);
+    formData.append("file_name", file);
+    const res = await uploadFileDB(formData);
     console.log(res.data);
     const fileinfo = res.data.split(",");
     console.log(fileinfo);
     setBsFile(fileinfo[0]);
     setBsSize(fileinfo[1]);
   };
+
   const handleFiles = () => {};
   return (
     <>
@@ -165,16 +173,13 @@ const RepleBoardWriteForm = () => {
             </div>
             <input
               id="file-input"
+              name="file_name"
               ref={fileRef}
               type="file"
               maxLength="50"
               className="visuallyhidden"
               onChange={handleChange}
             />
-            <button style={{ height: "40px" }} onClick={handleClick}>
-              파일선택
-            </button>
-            &nbsp;
             <input
               id="bs_file"
               name="bs_file"
@@ -197,7 +202,7 @@ const RepleBoardWriteForm = () => {
               files={files}
               handleFiles={handleFiles}
             />
-            {/* <BoardFileInsert files={files}/> */}
+            <RepleBoardFileInsert files={files} />
           </div>
         </FormDiv>
       </ContainerDiv>
