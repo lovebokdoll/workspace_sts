@@ -20,13 +20,15 @@ import { onAuthChange } from "./service/authLogic";
 import { memberListDB } from "./service/dbLogic";
 
 function App({ authLogic, imageUploader }) {
-  const navigate = useNavigate();
+  //화면을 전환시킬때 - window.location.href차이점 -새로고침 요청발생 - 가상돔 사용하지 않음
+  const navigate = useNavigate(); //가상돔 사용됨
   //useDispatch hook사용하여 dispacth함수 가져오기.
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); //허브 - action.type(switch-선택),action.payload(내용)
   //state인자를 통해 Redux store의 state에 접근하고 state.toastStatus반환하여 해당 state를 가져온다
   const toastStatus = useSelector((state) => state.toastStatus);
   useEffect(() => {
     const asyncDB = async () => {
+      console.log("asyncDB");
       const auth = authLogic.getUserAuth();
       const ssg = sessionStorage;
       //현재 인증된 사용자정보를 가져온다.
@@ -73,7 +75,7 @@ function App({ authLogic, imageUploader }) {
         }
       } //end of else
     };
-    asyncDB();
+    asyncDB(); //함수호출
   }, [dispatch]);
   return (
     <>
@@ -121,10 +123,7 @@ function App({ authLogic, imageUploader }) {
             exact={true}
             element={<RepleBoardDetail />}
           />
-          <Route //
-            path="/reple/boarddetail/:bm_no"
-            element={<RepleBoardDetail />}
-          />
+
           <Route //
             path="/reple/boardwrite"
             exact={true}

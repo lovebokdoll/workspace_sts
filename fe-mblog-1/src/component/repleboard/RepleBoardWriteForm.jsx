@@ -1,23 +1,18 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  boardInsertDB,
-  uploadFileDB,
-  uploadImageDB,
-} from "../../service/dbLogic";
+import { qnaInsertDB, uploadFileDB } from "../../service/dbLogic";
 import { BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
 import QuillEditor from "./QuillEditor";
 import RepleBoardFileInsert from "./RepleBoardFileInsert";
+
 const RepleBoardWriteForm = () => {
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [writer, setWriter] = useState("");
-  const [pw, setPW] = useState("");
-  const [content, setContent] = useState("");
-  const [bsfile, setBsFile] = useState("");
-  const [bssize, setBsSize] = useState("");
-  const [fileName, setFileName] = useState("");
-  //QuillEditor이미지 선택하면 imageUploadDB타면 스프링프로젝트 pds이미지 업로드
+  const no = sessionStorage.getItem("no");
+  const [title, setTitle] = useState(""); //사용자가 입력한 제목 담기
+  const [secret, setSecret] = useState(""); //사용자가 입력한 pw 담기
+  const [content, setContent] = useState(""); //사용자가 입력한 내용 담기
+  const [file_name, setFilename] = useState(""); //이미지 말고 첨부파일 이름 담기
+  //QuillEditor이미지 선택하면 imageUploadDB타면 스프링플젝 pds 이미지 업로드
   //pds에 업로드된 파일을 읽어서 Editor안에 보여줌 imageGet?imageName=woman1.png
   const [files, setFiles] = useState([]);
   const quillRef = useRef();
@@ -26,41 +21,35 @@ const RepleBoardWriteForm = () => {
   const handleTitle = useCallback((e) => {
     setTitle(e);
   }, []);
-  const handleWriter = useCallback((e) => {
-    setWriter(e);
+
+  const handleSecret = useCallback((e) => {
+    setSecret(e);
   }, []);
-  const handlePW = useCallback((e) => {
-    setPW(e);
-  }, []);
-  const handleContent = useCallback((e) => {
-    setContent(e);
+  const handleContent = useCallback((value) => {
+    //quilleditor에서 담김 - 태그포함된 정보
+    setContent(value);
   }, []);
   const boardInsert = async () => {
     const board = {
-      bm_title: title,
-      bm_content: content,
-      bm_pw: pw,
-      bm_writer: writer,
-      bs_file: bsfile,
-      bs_size: bssize,
+      qna_no: 0, //오라클 자동채번하는 시퀀스 사용
+      qna_title: title,
+      qna_content: content,
+      qna_type: "양도", //상수로 박음
+      qna_secret: secret,
+      qna_hit: 0,
+      mem_no: no,
     };
-    //   const res = await boardInsertDB(board);
-    // console.log(res);
-    //window.location.replace("/board")
-    navigate("/board");
-  };
-  const handleClick = (event) => {
-    event.preventDefault();
-    document.querySelector("#file-input").click((event) => {
-      console.log(event.currentTarget.value);
-    });
+    const res = await qnaInsertDB(board);
+    console.log(res);
+    //window.location.replace("/board");
+    navigate("/reple/board");
   };
   const handleChange = async (event) => {
     console.log("첨부파일 선택" + event.target.value);
     //console.log(fileRef.current.value);
     //fileRef에서 가져온 값중 파일명만 담기
     const str = fileRef.current.value.split("/").pop().split("\\").pop();
-    setFileName(str);
+    setFilename(str);
     console.log(str);
     //선택한 파일을 url로 바꾸기 위해 서버로 전달할 폼데이터 만들기
     const formData = new FormData();
@@ -70,10 +59,7 @@ const RepleBoardWriteForm = () => {
     console.log(res.data);
     const fileinfo = res.data.split(",");
     console.log(fileinfo);
-    setBsFile(fileinfo[0]);
-    setBsSize(fileinfo[1]);
   };
-
   const handleFiles = () => {};
   return (
     <>
@@ -121,30 +107,6 @@ const RepleBoardWriteForm = () => {
                 marginBottom: "5px",
               }}
             >
-              <h3>작성자</h3>
-            </div>
-            <input
-              id="dataset-writer"
-              type="text"
-              maxLength="50"
-              placeholder="작성자를 입력하세요."
-              style={{
-                width: "200px",
-                height: "40px",
-                border: "1px solid lightGray",
-                marginBottom: "5px",
-              }}
-              onChange={(e) => {
-                handleWriter(e.target.value);
-              }}
-            />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "5px",
-              }}
-            >
               <h3>비밀번호</h3>
             </div>
             <input
@@ -159,7 +121,7 @@ const RepleBoardWriteForm = () => {
                 marginBottom: "5px",
               }}
               onChange={(e) => {
-                handlePW(e.target.value);
+                handleSecret(e.target.value);
               }}
             />
             <div
@@ -180,16 +142,10 @@ const RepleBoardWriteForm = () => {
               className="visuallyhidden"
               onChange={handleChange}
             />
-            <input
-              id="bs_file"
-              name="bs_file"
-              type="text"
-              maxLength="50"
-              value={fileName}
+            <div
               style={{
-                width: "600px",
-                height: "40px",
-                border: "1px solid lightGray",
+                display: "flex",
+                justifyContent: "space-between",
                 marginBottom: "5px",
               }}
             />

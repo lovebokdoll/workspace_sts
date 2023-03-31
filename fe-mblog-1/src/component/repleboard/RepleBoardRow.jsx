@@ -1,11 +1,17 @@
-import React from 'react'
+import React from "react";
 
-const RepleBoardRow = () => {
+const RepleBoardRow = ({ item }) => {
   return (
-    <div>
-      게시판 로우페이지
-    </div>
-  )
-}
+    <>
+      <tr>
+        <td>{item.QNA_BNO}</td>
+        <td>{item.QNA_TITLE}</td>
+        <td>{item.MEM_NAME}</td>
+        <td>{item.QNA_DATE}</td>
+        <td>{item.QNA_HIT}</td>
+      </tr>
+    </>
+  );
+};
 
-export default RepleBoardRow
+export default RepleBoardRow;

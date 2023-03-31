@@ -3,8 +3,9 @@ import { Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import BlogFooter from "../include/BlogFooter";
 import BlogHeader from "../include/BlogHeader";
+import RepleBoardList from "../repleboard/RepleBoardList";
 
-const RepleBoardPage = () => {
+const RepleBoardPage = ({ board }) => {
   const navigate = useNavigate();
   const boardSearch = () => {};
   return (
@@ -55,13 +56,7 @@ const RepleBoardPage = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>댓글형게시판구현</td>
-                <td>관리자</td>
-                <td>2023-03-23</td>
-                <td>100</td>
-              </tr>
+              <RepleBoardList />
             </tbody>
           </Table>
           <hr />

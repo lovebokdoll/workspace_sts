@@ -16,17 +16,20 @@ public class RepleBoardLogic {
 	@Autowired
 	private RepleBoardDao repleBoardDao = null;
 
-	public List<Map<String, Object>> boardList(Map<String, Object> pMap) {
-		log.info("boardList호출");
-		List<Map<String, Object>> bList = repleBoardDao.boardList(pMap);
-		return bList;
+
+	public List<Map<String, Object>> qnaList(Map<String, Object> pMap) {
+		log.info("qnaList호출");
+		List<Map<String, Object>> qList = repleBoardDao.qnaList(pMap);
+		return qList;
+	};
+
+	public int qnaInsert(Map<String, Object> pMap) {
+		log.info("qnaInsert호출");
+		int result=0;
+		result=	repleBoardDao.qnaInsert(pMap);
+		return result;
 	}
 
-	public int boardInsert(Map<String, Object> pMap) {
-		log.info("boardInsert호출");
-		int result=0;
-		result=	repleBoardDao.boardInsert(pMap);
-		return result;
-	};
+
 
 }

@@ -33,6 +33,7 @@ public class RepleBoardController {
 	@Autowired
 	private RepleBoardLogic repleBoardLogic = null;
 
+	
 	@PostMapping("fileUpload")
 	public Object fileUpload(MultipartHttpServletRequest mRequest,
 			@RequestParam(value = "file_name", required = false) MultipartFile file_name) {
@@ -165,22 +166,22 @@ public class RepleBoardController {
 		return temp;
 	}
 
-	@GetMapping("boardList")
-	public String boardList(@RequestParam Map<String, Object> pMap) {
-		log.info("boardList 호출");
-		List<Map<String, Object>> bList = null;
-		bList = repleBoardLogic.boardList(pMap);
+	@GetMapping("qnaList")
+	public String qnaList(@RequestParam Map<String, Object> pMap) {
+		log.info("qnaList 호출");
+		List<Map<String, Object>> qList = null;
+		qList = repleBoardLogic.qnaList(pMap);
 		Gson g = new Gson();
-		String temp = g.toJson(bList);
+		String temp = g.toJson(qList);
 		return temp;
 	}
 
-	@PostMapping("boardInsert")
-	public String boardInsert(@RequestBody Map<String, Object> pMap) {
-		log.info("boardInsert 호출");
+	@PostMapping("qnaInsert")
+	public String qnaInsert(@RequestBody Map<String, Object> pMap) {
+		log.info("qnaInsert 호출");
 		log.info(pMap);
 		int result = 0;
-		result = repleBoardLogic.boardInsert(pMap);
+		result = repleBoardLogic.qnaInsert(pMap);
 		return String.valueOf(result);
 	}
 

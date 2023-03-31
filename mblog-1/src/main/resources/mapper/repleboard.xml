@@ -1,17 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo">
-	<select id="boardList" parameterType="java.util.HashMap"
+	<select id="qnaList" parameterType="java.util.HashMap"
 		resultType="map">
 		SELECT
-				Q.QNA_BNO
-				,Q.QNA_TITLE
-				,Q.QNA_CONTENT
-				, M.MEM_NAME
-				,Q.QNA_TYPE
-				,Q.QNA_DATE
+		Q.QNA_BNO
+		,Q.QNA_TITLE
+		,Q.QNA_CONTENT
+		, M.MEM_NAME
+		,Q.QNA_TYPE
+		,Q.QNA_DATE
 		FROM QNA q, MEMBER230324 m
-		WHERE q.MEM_NO = m.MEM_NO
+		WHERE q.MEM_NO =
+		m.MEM_NO
 	</select>
+	<!-- @RequestParam - Map타입이 올 수 있다.-Get방식 요청 -요청 header담김 - 인터셉트 - 캐시에 있는 
+		정보가 다시 출력될 수 있다. :문제점 : 노출 -URL ->보안상 취약하다 -조회할 때 사용 @RequesrBody - POST방식요청 
+		- 단위테스트 불가 - postman으로 테스트 가능 - 요청Body에 담김 - 인터셉트 불가 - 무조건 서버로 전달 :VO,Map 
+		원시형타입 모두 가능 [질문 : mem_no는 어디서 가져오나요?] qna_type 즉 질문 타입은 상수로 양도를 줌 qna_secreat에는 
+		비번을 입력받음 비번이 null이면 공개 null이 아니면 비공개 처리가 가능한가? [생각해볼 문제 : 화면에서 가져올 컬럼의 종류는 
+		몇가지 인가?] 세션이나 쿠키에서 또는 세션스토리지에서 가져와야 하는 컬럼이 있을까? 상수로 넣을 수 있는 (또는 넣어야 하는 ) 
+		컬럼이 존재하나? 만일 존재한다면 어떤 컬럼인지 말해보자! -->
+	<insert id="qnaInsert" parameterType="map">
+		INSERT INTO QNA(
+		QNA_BNO,
+		MEM_NO,
+		QNA_TITLE,
+		QNA_CONTENT,
+		QNA_TYPE,
+		QNA_SECRET,
+		QNA_HIT,
+		QNA_DATE
+		)
+		values(
+		qna_seq.nextval,
+		#{mem_no},
+		#{qna_title},
+		#{qna_content},
+		#{qna_type},
+		#{qna_secret},
+		#{qna_hit},
+		TO_CHAR
+		(SYSDATE,
+		'YYYY-MM-DD HH24:MI:SS')
+		)
+	</insert>
 
 </mapper>
