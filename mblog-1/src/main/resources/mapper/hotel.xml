@@ -4,7 +4,7 @@
 
 <select id="hotelList" parameterType="map" resultType="map">
 		select 
-    		p_title,p_tel,p_address,p_overview,p_detail
+    		p_title,p_tel,p_address,p_overview,p_detail,p_refund
   		  from PROPERTIES
     		</select>
 	</mapper>

@@ -165,10 +165,12 @@ public class RepleBoardController {
 		String temp = filename;
 		return temp;
 	}
-
+//http://localhost:8000/reple/qnaList?content=제목
+//http://localhost:8000/reple/qnaList?content=제목&condition=내용
 	@GetMapping("qnaList")
 	public String qnaList(@RequestParam Map<String, Object> pMap) {
 		log.info("qnaList 호출");
+		log.info(pMap);
 		List<Map<String, Object>> qList = null;
 		qList = repleBoardLogic.qnaList(pMap);
 		Gson g = new Gson();

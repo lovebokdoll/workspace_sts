@@ -8,7 +8,37 @@ export const qnaListDB = (board) => {
         //3000번 서버에서 8000번 서버로 요청을 함 - 네트워크(다른서버) =>CORS이슈!
         method: "get",
         url: process.env.REACT_APP_SPTING_IP + "reple/qnaList",
-        params: board,
+        params: board, //get방식
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+export const qnaUpdateDB = (board) => {
+  //대소문자 구분 어떻게 할것인가
+  //파라미터는 소문자로 리턴값은 대문자로 아니면  둘다 대문자?
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "post", //@RequestBody
+        url: process.env.REACT_APP_SPTING_IP + "reple/qnaUpdate",
+        data: board, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+export const qnaDeleteDB = (board) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "get", //@RequestBody
+        url: process.env.REACT_APP_SPTING_IP + "reple/qnaDelete",
+        params: board, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
       });
       resolve(response);
     } catch (error) {
