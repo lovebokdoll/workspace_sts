@@ -47,6 +47,7 @@ export const qnaDeleteDB = (board) => {
   });
 };
 export const qnaInsertDB = (board) => {
+  console.log(board); //fileNames=['man1.png','man2.png','man3.png']
   return new Promise((resolve, reject) => {
     try {
       const response = axios({

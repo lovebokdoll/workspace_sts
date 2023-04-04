@@ -7,9 +7,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { qnaListDB } from "../../service/dbLogic";
 import BlogFooter from "../include/BlogFooter";
 import BlogHeader from "../include/BlogHeader";
+
 import { BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
-import KhSearchBar from "./KhSearchBar";
 import KhMyFilter from "./KhMyFilter";
+import KhSearchBar from "./KhSearchBar";
 
 const KhQnAListPage = ({ authLogic }) => {
   //페이징 처리시에 현재 내가 바라보는 페이지 정보 담기
@@ -35,9 +36,17 @@ const KhQnAListPage = ({ authLogic }) => {
     const qnaList = async () => {
       //콤보박스 내용 -> 제목, 내용, 작성자 중 하나
       //사용자가 입력한 키워드
-      //http://localhost:3000/qna/list?condition=제목|내용|작성자&content=입력한값
-      //[0] -condition=제목|내용|작성자
-      //[1] -content=입력한 값
+      //http://localhost:3000/qna/list?page=1&qna_type=수업
+      const qna_type = search
+        .split("&")
+        .filter((item) => {
+          return item.match("qna_type");
+        })[0]
+        ?.split("=")[1];
+      console.log(qna_type); //수업저장됨
+      //http://localhost:3000/qna/list?condition=제목%7C내용%7C작성자&content=입렧한 값
+      //[0]-?condition=제목|내용|작성자
+      //[1]-content=입렧한 값
       const condition = search
         .split("&")
         .filter((item) => {
@@ -52,21 +61,13 @@ const KhQnAListPage = ({ authLogic }) => {
         })[0]
         ?.split("=")[1];
       console.log(content);
-      //http://localhost:3000/qna/list?page=1&qna_type=수업
-      const qna_type = search
-        .split("&")
-        .filter((item) => {
-          return item.match("qna_type");
-        })[0]
-        ?.split("=")[1];
-      console.log(qna_type); //수업저장됨
       setTTitle(qna_type || "전체"); //쿼리스트링이 없으면 그냥 전체가 담김
       const board = {
         //get방식 조건검색 - params속성에 들어갈 변수
         page: page,
         qna_type: qna_type,
         condition: condition,
-        content: content,
+        content: content, //키워드
       };
       const res = await qnaListDB(board);
       console.log(res.data);
@@ -81,6 +82,9 @@ const KhQnAListPage = ({ authLogic }) => {
           mem_name: item.MEM_NAME,
           qna_date: item.QNA_DATE,
           qna_hit: item.QNA_HIT,
+          qna_secret: JSON.parse(item.QNA_SECRET), //"false"(문자열) -> false
+          file: item.FILE_NAME,
+          comment: item.COMM_NO,
         };
         list.push(obj);
       });
@@ -92,6 +96,12 @@ const KhQnAListPage = ({ authLogic }) => {
   //listItemsElements 클릭이벤트 처리시 사용
   const getAuth = (listItem) => {
     console.log(listItem);
+    console.log(listItem.qna_secret);
+    if (listItem.qna_secret === false) {
+      navigate(`/qna/detail?qna_bno=${listItem.qna_bno}`);
+    } else {
+      alert("비공개글입니다.");
+    }
   };
 
   const listHeaders = ["글번호", "분류", "제목", "작성자", "등록일", "조회수"];
@@ -174,15 +184,7 @@ const KhQnAListPage = ({ authLogic }) => {
       <ContainerDiv>
         <HeaderDiv>
           <h3 style={{ marginLeft: "10px" }}>QnA 게시판</h3>
-          <BButton
-            onClick={() => {
-              navigate("/qna/write");
-            }}
-          >
-            글쓰기
-          </BButton>
         </HeaderDiv>
-
         <FormDiv>
           <div>
             <div
@@ -199,7 +201,8 @@ const KhQnAListPage = ({ authLogic }) => {
                 title={tTitle}
                 handleTitle={handleTTitle}
               />
-              {sessionStorage.getItem("auth") === "2" && (
+              {/* 로그인해야만 글쓰기 버튼이 보이게 되어있음. */}
+              {sessionStorage.getItem("auth") === "teacher" && (
                 <BButton
                   style={{ width: "80px", height: "38px" }}
                   onClick={() => {

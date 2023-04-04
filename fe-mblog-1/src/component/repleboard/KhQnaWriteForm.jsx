@@ -1,27 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useCallback } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 import { Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { qnaInsertDB } from "../../service/dbLogic";
 import BlogFooter from "../include/BlogFooter";
 import BlogHeader from "../include/BlogHeader";
 import { BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
-import KhMyFilter from "./KhMyFilter";
 import QuillEditor from "./QuillEditor";
 import RepleBoardFileInsert from "./RepleBoardFileInsert";
-
+import { qnaInsertDB } from "../../service/dbLogic";
+import { useNavigate } from "react-router-dom";
+import KhMyFilter from "./KhMyFilter";
 const KhQnAWriteForm = ({ authLogic }) => {
   const navigate = useNavigate();
-  //props로 넘어온 값 즉시 구조분해할당
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(""); //제목
   const [content, setContent] = useState(""); //내용작성
   const [secret, setSecret] = useState(false); //비밀글
   const [tTitle, setTTitle] = useState("일반"); //qna_type
-  const [types] = useState(["일반", "결제", "양도", "회원", "수업"]); //qna_type의 라벨값
+  const [types] = useState(["일반", "결제", "양도", "회원", "수업"]); //qna_type의 라벨 값
   const [files, setFiles] = useState([]); //파일처리
   const quillRef = useRef();
+
+  useEffect(() => {
+    for (let i = 0; i < files.length; i++) {
+      if (!content.match(files[i])) {
+        console.log(files);
+        setFiles(files.filter((file) => file != files[i]));
+      }
+    }
+  }, [content, setFiles, files]);
 
   const handleContent = useCallback((value) => {
     console.log(value);
@@ -30,7 +37,7 @@ const KhQnAWriteForm = ({ authLogic }) => {
 
   const handleFiles = useCallback(
     (value) => {
-      setFiles([...files, value]);
+      setFiles([...files, value]); //깊은복사
     },
     [files]
   );
@@ -44,21 +51,23 @@ const KhQnAWriteForm = ({ authLogic }) => {
   }, []);
 
   const qnaInsert = async () => {
-    //post처리
+    //post
     console.log("qnaInsert");
-    console.log(secret); //true,0이 아닌거는 모두 true
-    console.log(typeof secret); //boolean 타입출력
+    console.log(secret);
+    console.log(typeof secret); //blooean 타입출력
     const board = {
       qna_title: title,
       qna_content: content,
-      qna_secret: secret ? "true" : "false",
+      qna_secret: secret ? "true" : "false", //문자열로
       qna_type: tTitle,
-      mem_no: sessionStorage.getItem("no"), //세션에 저장된거 불러옴
-    }; //사용자가 입력한 값 넘기기 -@RequestBody로 처리됨
+      mem_no: sessionStorage.getItem("no"),
+      fileNames: files,
+    }; //사용자가 입력한 값 넘기기 - @RequestBody로 처리됨
     const res = await qnaInsertDB(board);
     console.log(res.data);
     //성공시 페이지 이동처리
-    navigate("/qna/list");
+    window.location.replace("/qna/list?page=1");
+    // navigate("/qna/list");
   };
 
   return (

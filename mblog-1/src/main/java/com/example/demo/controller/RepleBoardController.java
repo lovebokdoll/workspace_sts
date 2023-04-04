@@ -32,8 +32,6 @@ import lombok.extern.log4j.Log4j2;
 public class RepleBoardController {
 	@Autowired
 	private RepleBoardLogic repleBoardLogic = null;
-
-	
 	@PostMapping("fileUpload")
 	public Object fileUpload(MultipartHttpServletRequest mRequest,
 			@RequestParam(value = "file_name", required = false) MultipartFile file_name) {
@@ -134,36 +132,19 @@ public class RepleBoardController {
 	 * @param images
 	 * @return
 	 */
+	//QuillEditor에서 선택한 이미지를 mblog_file테이블에 insert해보자
+	//왜 이런 수업을 준비했낭? - myBatis에서 insert태그의 역할이 있다. - 채번한 숫자를 캐쉬에 담아준다 
+	//그런데 select가 아니라서 resultType을 사용할 수 없다. (-> 프로시저 사용 -
+	//resultType은 불가하니까 남아있는것은 parameterType뿐이다 -매개변수에 값을 담아준다.
+	//TestParam.java ->HashMapBinder설계 파라미터에 값을 담아준다.
 	@PostMapping("imageUpload")
 	public Object imageUpload(MultipartHttpServletRequest mRequest,
 			@RequestParam(value = "image", required = false) MultipartFile image) {
 		log.info("imageUpload 호출 성공");
 		// 사용자가 선택한 파일이름 담기
-		String filename = null;
-		if (!image.isEmpty()) {
-			filename = image.getOriginalFilename();
-			// 스프링프로젝트가 바라보는 물리적인 위치정보
-			String saveFolder = "D:\\KH\\workspace_sts\\mblog-1\\src\\main\\webapp\\pds";
-			String fullPath = saveFolder + "\\" + filename;
-			try {
-				// File객체는 파일명을 객체화 해주는 클래스임 - 생성되었다고 해서 실제 파일까지 생성된 것이 아님
-				File file = new File(fullPath);
-				byte[] bytes = image.getBytes();
-				// outstream반드시 생성해서 파일정보를 읽어서 쓰기를 처리해주어야 완전한 파일이 생성된다.
-				// BufferedOutputStream은 필터클래스이지 실제 파일을 쓸 수 없는 객체이다.
-				// 실제 파일쓰기가 가능한 클래스가 FileOutputStream클래스이다 그래서 생성자 파라미터에 파일정도를 담아줘야 한다=> 그래야
-				// 실제파일 담을 수 있음
-				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-				bos.write(bytes);
-				// 파일쓰기와 관련된 위변조 방지위해 사용후 반드시 닫을 것
-				bos.close();
-			} catch (Exception e) {
-
-			}
-		}
+		String filename = repleBoardLogic.imageUpload( image);
 		// 리턴 값으로 선택한 이미지 파일명을 넘겨서 사용자 화면에 첨부된 파일명을 열거해 주는데 사용할 것임.
-		String temp = filename;
-		return temp;
+		return filename;
 	}
 //http://localhost:8000/reple/qnaList?content=제목
 //http://localhost:8000/reple/qnaList?content=제목&condition=내용
@@ -182,8 +163,15 @@ public class RepleBoardController {
 	public String qnaInsert(@RequestBody Map<String, Object> pMap) {
 		log.info("qnaInsert 호출");
 		log.info(pMap);
+		//회원번호를 int타입으로 변경하지 않으면 부적합한 열유형 111에러메시지
+		//Map,List:Object주의할것 - 부적합한 열유형 setNull(111)
+		if(pMap.get("mem_no")!=null) {
+			//NumberFormatException원인이됨
+			int mem_no=Integer.parseInt(pMap.get("mem_no").toString());
+			pMap.put("mem_no", pMap);
+		}
 		int result = 0;
-		result = repleBoardLogic.qnaInsert(pMap);
+		int qna_bno = repleBoardLogic.qnaInsert(pMap);
 		return String.valueOf(result);
 	}
 

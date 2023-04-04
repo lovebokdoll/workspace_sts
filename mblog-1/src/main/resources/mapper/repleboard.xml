@@ -16,27 +16,27 @@
 		FROM QNA q, MEMBER230324 m
 		WHERE q.MEM_NO =
 		m.MEM_NO
-		
-		<if test='qna_type!=null and !qna_type.equals("전체")' > <!-- khMyFilter조건검색시 사용 -->
+
+		<if test='qna_type!=null and !qna_type.equals("전체")'> <!-- khMyFilter조건검색시 사용 -->
 			And qna_type=#{qna_type}
 		</if>
-		<if test='mem_no!=null' > <!-- 회원고유번호별 조건검색시 사용 -->
+		<if test='mem_no!=null'> <!-- 회원고유번호별 조건검색시 사용 -->
 			And m.mem_no =#{mem_no}
 		</if>
-		<if test='qna_bno!=null' > <!-- 글번호 조건검색시 사용 -->
+		<if test='qna_bno!=null'> <!-- 글번호 조건검색시 사용 -->
 			And q.qna_bno =#{qna_bno}
 		</if>
-		<if test='content!=null' > <!-- 글번호 조건검색시 사용 -->
+		<if test='content!=null'> <!-- 글번호 조건검색시 사용 -->
 			<choose>
-			<when test='condition!=null and condition.equals("제목")'>
-			AND qna_title LIKE'%'||#{content}||'%'
-			</when>
-			<when test='condition!=null and condition.equals("내용")'>
-			AND qna_title LIKE'%'||#{content}||'%'
-			</when>
-			<when test='condition!=null and condition.equals("작성자")'>
-			AND qna_title LIKE'%'||#{content}||'%'
-			</when>
+				<when test='condition!=null and condition.equals("제목")'>
+					AND qna_title LIKE'%'||#{content}||'%'
+				</when>
+				<when test='condition!=null and condition.equals("내용")'>
+					AND qna_title LIKE'%'||#{content}||'%'
+				</when>
+				<when test='condition!=null and condition.equals("작성자")'>
+					AND qna_title LIKE'%'||#{content}||'%'
+				</when>
 			</choose>
 		</if>
 	</select>
@@ -47,15 +47,15 @@
 		비번을 입력받음 비번이 null이면 공개 null이 아니면 비공개 처리가 가능한가? [생각해볼 문제 : 화면에서 가져올 컬럼의 종류는 
 		몇가지 인가?] 세션이나 쿠키에서 또는 세션스토리지에서 가져와야 하는 컬럼이 있을까? 상수로 넣을 수 있는 (또는 넣어야 하는 ) 
 		컬럼이 존재하나? 만일 존재한다면 어떤 컬럼인지 말해보자! -->
-	<insert id="qnaInsert" parameterType="map">
+	<insert id="qnaInsert" parameterType="map" useGeneratedKeys="true" keyColumn='qna_bno' keyProperty='qna_bno'>
 		INSERT INTO QNA(
 		QNA_BNO,
 		MEM_NO,
 		QNA_TITLE,
 		QNA_CONTENT,
 		QNA_TYPE,
-		QNA_SECRET
-		 QNA_HIT,
+		QNA_SECRET,
+		QNA_HIT,
 		QNA_DATE
 		)
 		values(
@@ -64,12 +64,33 @@
 		#{qna_title},
 		#{qna_content},
 		#{qna_type},
-		#{qna_secret}
-		  #{qna_hit},
+		#{qna_secret},
+		0,
 		TO_CHAR
 		(SYSDATE,
 		'YYYY-MM-DD HH24:MI:SS')
 		)
 	</insert>
+	<!-- ==================================================================== -->
+	<select id="fileList" parameterType="map" resultType="map">
+		SELECT file_name,file_size
+		FROM mblog_file
+		WHERE qna_bno=#{qna_bno}
+	</select>
 
+	<insert id="fileInsert" parameterType="map">
+		INSERT INTO
+			mblog_file(file_no,file_path,file_name,file_size)
+		VALUES(mblog_file_seq.nextval,#{file_path}
+			,#{file_name},#{file_size})
+	</insert>
+	
+	<update id="fileUpdate" parameterType="list">
+	<foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close="; END;">
+		UPDATE MBLOG_FILE
+			SET board_type ='qna',
+				qna_bno =#{item.qna_bno}
+		WHERE file_name=LTRIM(#{item.file_name))
+	</foreach>
+	</update>
 </mapper>

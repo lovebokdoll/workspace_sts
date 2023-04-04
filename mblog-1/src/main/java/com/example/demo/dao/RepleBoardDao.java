@@ -25,9 +25,33 @@ public List<Map<String, Object>> qnaList(Map<String, Object> pMap) {
 
 	public int qnaInsert(Map<String, Object> pMap) {
 		log.info("qnaInsert호출");
-		int result=0;
-		result = sqlSessionTemplate.update("qnaInsert",pMap);
+		int result=0;//입력이 성공했는지 유무를 담는 변수선언
+		int qna_bno=0;//insert시에 시퀀스로 채번된 속성 담을 변수 - 여기서 시퀀스로 채번되는 qna_bno임
+		result = sqlSessionTemplate.insert("qnaInsert",pMap);
+		if(result==1) {
+			if(pMap.get("qna_bno")!=null){
+				qna_bno=Integer.parseInt(pMap.get("qna_bno").toString());
+			}
+		}
+		log.info("result={}",result);
+		log.info("useGeneratedKeys 프로퍼티 속성값 가져오기={}",qna_bno);
 		return result;
+	}
+
+	public int fileInsert(Map<String, Object> pMap) {
+		log.info("fileInsert호출");
+		int result =0; //입력이 성공했는지 담기
+		result=sqlSessionTemplate.insert("fileInsert",pMap);
+		return result;
+	}
+
+	public int fileUpdate(List<Map<String, Object>> pList) {
+		log.info("fileUpdate호출");
+		log.info("pList={}",pList);
+		int result =0; //입력이 성공했는지 담기
+		result=sqlSessionTemplate.update("fileUpdate",pList);
+		return result;
+		
 	}
 
 

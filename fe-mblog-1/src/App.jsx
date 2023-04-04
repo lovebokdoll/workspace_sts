@@ -13,10 +13,10 @@ import DeptPage from "./component/page/DeptPage";
 import HomePage from "./component/page/HomePage";
 import MemberPage from "./component/page/MemberPage";
 import RepleBoardPage from "./component/page/RepleBoardPage";
-import KhQnaUpdatePage from "./component/repleboard/KhQnaDetailPage";
+import KhQnADetailPage from "./component/repleboard/KhQnADetailPage";
+import KhQnaUpdatePage from "./component/repleboard/KhQnaUpdatePage";
 import KhQnAListPage from "./component/repleboard/KhQnAListPage";
-import KhQnaDetailPage from "./component/repleboard/KhQnaUpdatePage";
-import KhQnaWriteForm from "./component/repleboard/KhQnaWriteForm";
+import KhQnAWriteForm from "./component/repleboard/KhQnaWriteForm";
 import RepleBoardDetail from "./component/repleboard/RepleBoardDetail";
 import RepleBoardWriteForm from "./component/repleboard/RepleBoardWriteForm";
 import Toast from "./component/Toast";
@@ -126,12 +126,12 @@ function App({ authLogic, imageUploader }) {
           <Route //
             path="/qna/detail/*"
             exact={true}
-            element={<KhQnaDetailPage />}
+            element={<KhQnADetailPage />}
           />
           <Route //
             path="/qna/write/*"
             exact={true}
-            element={<KhQnaWriteForm authLogic={authLogic} />}
+            element={<KhQnAWriteForm authLogic={authLogic} />}
           />
           <Route //
             path="/qna/update/:bno"
