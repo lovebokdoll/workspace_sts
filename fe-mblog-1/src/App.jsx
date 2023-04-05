@@ -14,7 +14,6 @@ import HomePage from "./component/page/HomePage";
 import MemberPage from "./component/page/MemberPage";
 import RepleBoardPage from "./component/page/RepleBoardPage";
 import KhQnADetailPage from "./component/repleboard/KhQnADetailPage";
-import KhQnaUpdatePage from "./component/repleboard/KhQnaUpdatePage";
 import KhQnAListPage from "./component/repleboard/KhQnAListPage";
 import KhQnAWriteForm from "./component/repleboard/KhQnaWriteForm";
 import RepleBoardDetail from "./component/repleboard/RepleBoardDetail";
@@ -22,6 +21,7 @@ import RepleBoardWriteForm from "./component/repleboard/RepleBoardWriteForm";
 import Toast from "./component/Toast";
 import { onAuthChange } from "./service/authLogic";
 import { memberListDB } from "./service/dbLogic";
+import KhQnAUpdatePage from "./component/repleboard/KhQnAUpdatePage";
 
 function App({ authLogic, imageUploader }) {
   //화면을 전환시킬때 - window.location.href차이점 -새로고침 요청발생 - 가상돔 사용하지 않음
@@ -94,7 +94,7 @@ function App({ authLogic, imageUploader }) {
           <Route //
             path="/"
             exact={true}
-            element={<HomePage />}
+            element={<HomePage authLogic={authLogic} />}
           />
           <Route //
             path="/auth/signup"
@@ -121,12 +121,16 @@ function App({ authLogic, imageUploader }) {
             exact={true}
             element={<RepleBoardPage />}
           />
-          <Route path="/qna/list" exact={true} element={<KhQnAListPage />} />
+          <Route
+            path="/qna/list"
+            exact={true}
+            element={<KhQnAListPage authLogic={authLogic} />}
+          />
 
           <Route //
             path="/qna/detail/*"
             exact={true}
-            element={<KhQnADetailPage />}
+            element={<KhQnADetailPage authLogic={authLogic} />}
           />
           <Route //
             path="/qna/write/*"
@@ -136,7 +140,7 @@ function App({ authLogic, imageUploader }) {
           <Route //
             path="/qna/update/:bno"
             exact={true}
-            element={<KhQnaUpdatePage />}
+            element={<KhQnAUpdatePage authLogic={authLogic} />}
           />
           <Route //
             path="/reple/boarddetail/*"

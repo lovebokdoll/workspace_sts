@@ -8,8 +8,17 @@ const RepleBoardHeader = ({ detail, bno }) => {
   console.log(bno);
   const navigate = useNavigate();
 
-  const boardDelete = async () => {};
-  const qnaList = () => {};
+  const boardDelete = async () => {
+    const board = {
+      qna_bno: bno, //mybatis.xml코드 #{qna_bno}
+    };
+    const res = await qnaDeleteDB(board);
+    navigate("/qna/list?page=1");
+  };
+  const qnaList = () => {
+    //파라미터로 받은 페이지 번호가 돌아갈 페이지정보이다. => 변수로 처리
+    navigate("/qna/list?page=1");
+  };
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>

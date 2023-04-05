@@ -4,7 +4,7 @@ import BlogHeader from "../include/BlogHeader";
 import KakaoMap from "../kakao/KakaoMap";
 import { BButton, ContainerDiv, FormDiv, HeaderDiv } from "../style/FormStyle";
 
-const HomePage = () => {
+const HomePage = ({ authLogic }) => {
   const member = window.localStorage.getItem("member");
   console.log(JSON.parse(member));
   const jsonDoc = JSON.parse(member);
@@ -17,7 +17,7 @@ const HomePage = () => {
   return (
     <>
       <ContainerDiv>
-        <BlogHeader />
+        <BlogHeader authLogic={authLogic} />
         <HeaderDiv>
           <h1 style={{ marginLeft: "10px" }}> 다희블로그</h1>
           <BButton onClick={handleLogin}> 로그인</BButton>

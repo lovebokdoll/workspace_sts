@@ -17,6 +17,7 @@ export const qnaListDB = (board) => {
   });
 };
 export const qnaUpdateDB = (board) => {
+  console.log(board);
   //대소문자 구분 어떻게 할것인가
   //파라미터는 소문자로 리턴값은 대문자로 아니면  둘다 대문자?
   return new Promise((resolve, reject) => {
@@ -54,6 +55,21 @@ export const qnaInsertDB = (board) => {
         method: "post", //@RequestBody
         url: process.env.REACT_APP_SPTING_IP + "reple/qnaInsert",
         data: board, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+export const qnaDetailDB = (board) => {
+  console.log(board); //QNA_BNO,qna_bno const obj={QNA_BNO:29}
+  return new Promise((resolve, reject) => {
+    try {
+      const response = axios({
+        method: "get", //@RequestBody
+        url: process.env.REACT_APP_SPTING_IP + "reple/qnaDetail",
+        params: board, //post방식으로 전송시 반드시 data속성으로 파라미터 줄 것
       });
       resolve(response);
     } catch (error) {

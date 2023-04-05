@@ -31,27 +31,33 @@ public class RepleBoardLogic {
 	};
 
 	public int qnaInsert(Map<String, Object> pMap) {
-		log.info("qnaInsert호출");
-		// 여기서 result는 insert성공유무를 나타내는 숫자(1이면 성공 0이면 실패)가 아니라
-		// 글등록시에 채번된 시퀀스를 돌려받는 값이어야 한다.=> qna_bno값이여야 한다
-		int result = 0;
-		result = repleBoardDao.qnaInsert(pMap);
-		// 위에서 돌려받은 시퀀스값(qna_bno)를 pMap에 담아준다.
-		// 키값이 소문자이면 #{qna_bno} 키값이 대문자이면 #{QNA_BNO}여야 한다
-		// 사용자가 입력한 값의 키값은 모두 소문자
+
+		log.info("pMap = {}", pMap);
+
+		// 여기서 result는 insert 성공유무를 나타내는 숫자(1:성공,0:실패)가 아니라
+		// 글등록시에 채번된 시퀀스를 돌려받는 값이어야 한다
+		// qna_bno값이어야 한다
+		int result = repleBoardDao.qnaInsert(pMap);
+		// 위에서 돌려받은 시퀀스값(qna_bno)를 pMap에 담아준다
+		// 키값이 소문자이면 #{qna_bno}, 대문자이면 #{QNA_BNO}
+		// 사용자가 입력한 값의 키값은 모두 싹다 소문자로 하자
 		pMap.put("qna_bno", result);
 		// 선택한 이미지가 있니?
 		if (pMap.get("fileNames") != null) {
-			// 작성자가 선택하는 이미지의 갯수가 다르다.
-			// 3개이면 3개를 담아내야 한다. -3개에 대한 update가 3번 일어나야 한다.
+			// 작성자가 선택하는 이미지의 갯수가 다르다
+			// 3개이면 3개를 담아내야 함 - 3개에 대한 update가 3번 일어나야 함
+			List<Map<String, Object>> fList = fileNames(pMap);
+			log.info(fList);
 			repleBoardDao.fileUpdate(fileNames(pMap));
 		}
 		return result;
 	}
 
 	private List<Map<String, Object>> fileNames(Map<String, Object> pMap) {
+		log.info("fileNames");
+		log.info(pMap.get("fileNames"));
 		List<Map<String, Object>> pList = new ArrayList<>();
-		// pMap.get("fileNames"); => 리턴하는 형태는 배열 ['man1.png','man2.png','man3.png']
+		// pMap.get("fileNames")=> ["man1.png","man2.png","man3.png"]
 		HashMap<String, Object> fMap = null;
 		String[] fileNames = pMap.get("fileNames").toString()
 				.substring(1, pMap.get("fileNames").toString().length() - 1).split(",");
@@ -84,10 +90,12 @@ public class RepleBoardLogic {
 				// File객체는 파일명을 객체화 해주는 클래스임 - 생성되었다고 해서 실제 파일까지 생성된 것이 아님
 				File file = new File(fullPath);
 				byte[] bytes = image.getBytes();
-				// outstream반드시 생성해서 파일정보를 읽어서 쓰기를 처리해주어야 완전한 파일이 생성된다.
-				// BufferedOutputStream은 필터클래스이지 실제 파일을 쓸 수 없는 객체이다.
-				// 실제 파일쓰기가 가능한 클래스가 FileOutputStream클래스이다 그래서 생성자 파라미터에 파일정도를 담아줘야 한다=> 그래야
-				// 실제파일 담을 수 있음
+				/**
+				 * outstream반드시 생성해서 파일정보를 읽어서 쓰기를 처리해주어야 완전한 파일이 생성된다. BufferedOutputStream은
+				 * 필터클래스이지 실제 파일을 쓸 수 없는 객체이다. 실제 파일쓰기가 가능한 클래스가 FileOutputStream클래스이다 그래서 생성자
+				 * 파라미터에 파일정도를 담아줘야 한다=> 그래야 실제파일 담을 수 있음
+				 */
+
 				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 				bos.write(bytes);
 				// 파일쓰기와 관련된 위변조 방지위해 사용후 반드시 닫을 것
@@ -112,6 +120,48 @@ public class RepleBoardLogic {
 		// 리턴 값으로 선택한 이미지 파일명을 넘겨서 사용자 화면에 첨부된 파일명을 열거해 주는데 사용할 것임.
 		String temp = filename;
 		return temp;
+	}
+
+	/**
+	 * 한건만 가져오는데 왜 List에 Map인가? 그냥 Map으로도 가능하지 않아? DataSet변화
+	 * [{qna},{fileList},{commentList}]
+	 * 
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> qnaDetail(Map<String, Object> pMap) {
+		log.info("pMap={}", pMap);
+		int qna_bno = 0;
+		// 부적합한 열유형에 관한 에러코드 수정 (형전환)
+		if (pMap.get("QNA_BNO") != null) {
+			qna_bno = Integer.parseInt(pMap.get("QNA_BNO").toString());
+			pMap.put("qna_bno", qna_bno);
+		}
+
+		List<Map<String, Object>> qList = repleBoardDao.qnaDetail(pMap);
+		if (qList.size() > 0) {
+			repleBoardDao.qnaHit(pMap);
+		}
+		// 댓글처리 추가
+
+		// 이미지파일이 있어?
+		if (qList != null && qList.size() == 1) {
+			List<Map<String, Object>> fileList = repleBoardDao.fileList(pMap);
+			if (fileList != null && fileList.size() > 0) {
+				qList.addAll(fileList);
+			}
+		}
+		return qList;
+	}
+
+	public int qnaDelete(Map<String, Object> pMap) {
+		int result = repleBoardDao.qnaDelete(pMap);
+		return result;
+	}
+
+	public int qnaUpdate(Map<String, Object> pMap) {
+		int result = repleBoardDao.qnaUpdate(pMap);
+		return result;
 	}
 
 }

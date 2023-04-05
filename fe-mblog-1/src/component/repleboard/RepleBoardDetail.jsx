@@ -1,6 +1,6 @@
 import React from "react";
 
-const RepleBoardDetail = () => {
+const RepleBoardDetail = ({ files }) => {
   return <div>게시판 상세페이지</div>;
 };
 

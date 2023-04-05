@@ -4,6 +4,10 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +41,9 @@ import lombok.extern.log4j.Log4j2;
 public class RepleBoardController {
 	@Autowired
 	private RepleBoardLogic repleBoardLogic = null;
+
+	
+	
 	@PostMapping("fileUpload")
 	public Object fileUpload(MultipartHttpServletRequest mRequest,
 			@RequestParam(value = "file_name", required = false) MultipartFile file_name) {
@@ -132,20 +144,45 @@ public class RepleBoardController {
 	 * @param images
 	 * @return
 	 */
-	//QuillEditor에서 선택한 이미지를 mblog_file테이블에 insert해보자
-	//왜 이런 수업을 준비했낭? - myBatis에서 insert태그의 역할이 있다. - 채번한 숫자를 캐쉬에 담아준다 
-	//그런데 select가 아니라서 resultType을 사용할 수 없다. (-> 프로시저 사용 -
-	//resultType은 불가하니까 남아있는것은 parameterType뿐이다 -매개변수에 값을 담아준다.
-	//TestParam.java ->HashMapBinder설계 파라미터에 값을 담아준다.
+	// QuillEditor에서 선택한 이미지를 mblog_file테이블에 insert해보자
+	// 왜 이런 수업을 준비했낭? - myBatis에서 insert태그의 역할이 있다. - 채번한 숫자를 캐쉬에 담아준다
+	// 그런데 select가 아니라서 resultType을 사용할 수 없다. (-> 프로시저 사용 -
+	// resultType은 불가하니까 남아있는것은 parameterType뿐이다 -매개변수에 값을 담아준다.
+	// TestParam.java ->HashMapBinder설계 파라미터에 값을 담아준다.
 	@PostMapping("imageUpload")
 	public Object imageUpload(MultipartHttpServletRequest mRequest,
 			@RequestParam(value = "image", required = false) MultipartFile image) {
 		log.info("imageUpload 호출 성공");
 		// 사용자가 선택한 파일이름 담기
-		String filename = repleBoardLogic.imageUpload( image);
+		String filename = repleBoardLogic.imageUpload(image);
 		// 리턴 값으로 선택한 이미지 파일명을 넘겨서 사용자 화면에 첨부된 파일명을 열거해 주는데 사용할 것임.
 		return filename;
 	}
+
+	// 이미지 다운로드 처리
+	@GetMapping("imageDownload")
+	public ResponseEntity<Resource> imageDownload(@RequestParam(value = "imageName") String imageName) {
+		log.info("imageDownload호출");
+		String fileFolder = "D:\\KH\\workspace_sts\\mblog-1\\src\\main\\webapp\\pds";
+		try {
+			File file = new File(fileFolder, URLDecoder.decode(imageName, "UTF-8"));
+			HttpHeaders header = new HttpHeaders();
+			header.add(HttpHeaders.CONTENT_DISPOSITION, "attachmenr:filename" + imageName);
+			header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			header.add("Pragma", "no-cache");
+			header.add("Expires", "0");
+			Path path = Paths.get(file.getAbsolutePath());
+			// 이미지 리소스를 읽어서 담기
+			ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+			return ResponseEntity.ok().headers(header).contentLength(file.length())
+					.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource); // 이미지를 브라우저가
+																										// 로딩하지 못하게 함
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 //http://localhost:8000/reple/qnaList?content=제목
 //http://localhost:8000/reple/qnaList?content=제목&condition=내용
 	@GetMapping("qnaList")
@@ -159,20 +196,50 @@ public class RepleBoardController {
 		return temp;
 	}
 
+	@GetMapping( "qnaDetail" )
+	 public String qnaDetail( @RequestParam Map<String, Object> pMap ) {
+	 log.info( "pMap = {}", pMap );
+	 List<Map<String, Object>> qnaList = repleBoardLogic.qnaDetail( pMap );
+	 Gson gson = new Gson();
+	 String temp = gson.toJson( qnaList );
+	 log.info( "temp = {}", temp );
+	 return temp;
+	 }
+	
 	@PostMapping("qnaInsert")
 	public String qnaInsert(@RequestBody Map<String, Object> pMap) {
-		log.info("qnaInsert 호출");
-		log.info(pMap);
-		//회원번호를 int타입으로 변경하지 않으면 부적합한 열유형 111에러메시지
-		//Map,List:Object주의할것 - 부적합한 열유형 setNull(111)
-		if(pMap.get("mem_no")!=null) {
-			//NumberFormatException원인이됨
-			int mem_no=Integer.parseInt(pMap.get("mem_no").toString());
-			pMap.put("mem_no", pMap);
+		log.info("pMap = {}", pMap);
+		// 회원번호를 int타입으로 변경하지 않으면 부적합한 열유형 111에러메시지
+		// Map,List:Object주의할것 - 부적합한 열유형 setNull(111)
+		if (pMap.get("mem_no") != null) {
+			// NumberFormatException원인이됨
+			int mem_no = Integer.parseInt(pMap.get("mem_no").toString());
+			pMap.put("mem_no", mem_no);
 		}
-		int result = 0;
 		int qna_bno = repleBoardLogic.qnaInsert(pMap);
-		return String.valueOf(result);
+
+		log.info("qna_bno = {}", qna_bno);
+
+		return String.valueOf(qna_bno);
+	}
+
+	@GetMapping("qnaDelete")
+	public int qnaDelete(Map<String, Object> map) {
+		int result = repleBoardLogic.qnaDelete(map);
+		return result;
+	}
+
+	@PostMapping("qnaUpdate")
+	public int qnaUpdate(@RequestBody Map<String, Object> pMap) {
+		log.info("pMap = {}", pMap);
+		
+		if (pMap.get("qna_bno") != null) {
+			// NumberFormatException원인이됨
+			int qna_bno = Integer.parseInt(pMap.get("qna_bno").toString());
+			pMap.put("qna_bno", qna_bno);
+		}
+		int result = repleBoardLogic.qnaUpdate(pMap);
+		return result;
 	}
 
 }

@@ -4,61 +4,91 @@
 	<select id="qnaList" parameterType="java.util.HashMap"
 		resultType="map">
 		SELECT
-		Q.QNA_BNO
-		,Q.QNA_TITLE
-		,Q.QNA_CONTENT
-		, M.MEM_NAME
-		,Q.QNA_TYPE
-		,Q.QNA_DATE
-		,Q.QNA_SECRET
-		,M.MEM_NAME
-		,M.MEM_NO
-		FROM QNA q, MEMBER230324 m
-		WHERE q.MEM_NO =
-		m.MEM_NO
-
-		<if test='qna_type!=null and !qna_type.equals("전체")'> <!-- khMyFilter조건검색시 사용 -->
-			And qna_type=#{qna_type}
+		q.qna_bno, q.qna_title, q.qna_content
+		, q.qna_type, q.qna_hit,
+		q.qna_date, q.qna_secret
+		, m.mem_name, m.mem_no
+		FROM QNA q, member230324
+		m
+		WHERE q.mem_no = m.mem_no
+		<if test='qna_type!=null and !qna_type.equals("전체")'> <!-- KhMyFilter 조건검색시 사용 -->
+			AND qna_type=#{qna_type}
 		</if>
-		<if test='mem_no!=null'> <!-- 회원고유번호별 조건검색시 사용 -->
-			And m.mem_no =#{mem_no}
+		<if test='mem_no!=null'> <!-- 회원고유번호 별 조건검색시 사용 -->
+			AND m.mem_no = #{mem_no}
 		</if>
-		<if test='qna_bno!=null'> <!-- 글번호 조건검색시 사용 -->
-			And q.qna_bno =#{qna_bno}
+		<if test='qna_bno!=null'> <!-- 조건검색시 사용 -->
+			AND q.qna_bno = #{qna_bno}
 		</if>
-		<if test='content!=null'> <!-- 글번호 조건검색시 사용 -->
+		<if test='content!=null'>
 			<choose>
 				<when test='condition!=null and condition.equals("제목")'>
-					AND qna_title LIKE'%'||#{content}||'%'
+					AND qna_title LIKE '%' || #{content} || '%'
 				</when>
 				<when test='condition!=null and condition.equals("내용")'>
-					AND qna_title LIKE'%'||#{content}||'%'
+					AND qna_content LIKE '%' || #{content} || '%'
 				</when>
 				<when test='condition!=null and condition.equals("작성자")'>
-					AND qna_title LIKE'%'||#{content}||'%'
+					AND mem_name LIKE '%' || #{content} || '%'
 				</when>
 			</choose>
 		</if>
 	</select>
-	<!-- @RequestParam - Map타입이 올 수 있다.-Get방식 요청 -요청 header담김 - 인터셉트 - 캐시에 있는 
-		정보가 다시 출력될 수 있다. :문제점 : 노출 -URL ->보안상 취약하다 -조회할 때 사용 @RequesrBody - POST방식요청 
-		- 단위테스트 불가 - postman으로 테스트 가능 - 요청Body에 담김 - 인터셉트 불가 - 무조건 서버로 전달 :VO,Map 
-		원시형타입 모두 가능 [질문 : mem_no는 어디서 가져오나요?] qna_type 즉 질문 타입은 상수로 양도를 줌 qna_secreat에는 
-		비번을 입력받음 비번이 null이면 공개 null이 아니면 비공개 처리가 가능한가? [생각해볼 문제 : 화면에서 가져올 컬럼의 종류는 
-		몇가지 인가?] 세션이나 쿠키에서 또는 세션스토리지에서 가져와야 하는 컬럼이 있을까? 상수로 넣을 수 있는 (또는 넣어야 하는 ) 
-		컬럼이 존재하나? 만일 존재한다면 어떤 컬럼인지 말해보자! -->
-	<insert id="qnaInsert" parameterType="map" useGeneratedKeys="true" keyColumn='qna_bno' keyProperty='qna_bno'>
-		INSERT INTO QNA(
-		QNA_BNO,
-		MEM_NO,
-		QNA_TITLE,
-		QNA_CONTENT,
-		QNA_TYPE,
-		QNA_SECRET,
-		QNA_HIT,
-		QNA_DATE
+	<select id="qnaDetail" parameterType="java.util.HashMap"
+		resultType="map">
+		SELECT 
+		Q.QNA_BNO, 
+		Q.QNA_TITLE, 
+		Q.QNA_CONTENT,
+		Q.QNA_TYPE,
+		Q.QNA_SECRET,
+		Q.QNA_HIT, 
+		Q.QNA_DATE, 
+		M.MEM_NAME, 
+		M.MEM_NO, 
+		C.COMM_NO
+		FROM QNA Q, MEMBER230324 M,
+		(SELECT COUNT(COMM_NO)COMM_NO, QNA_BNO
+		FROM
+		QNA_COMMENT
+		GROUP BY QNA_BNO
+		) C
+		WHERE Q.MEM_NO = M.MEM_NO
+		AND Q.QNA_BNO =	C.QNA_BNO(+)
+		<if test='mem_no!=null'> <!-- 회원고유번호 별 조건 검색 시 사용 -->
+			AND M.MEM_NO = #{mem_no}
+		</if>
+		<if test='qna_bno!=null'> <!-- 조건 검색 시 사용 --> <!-- setNull(1, 1111) 에러 타입, Integer.parseInt() -->
+			AND Q.QNA_BNO = #{qna_bno}
+		</if>
+	</select>
+	<!-- @RequestParam - Map 타입이 올 수 있다 - Get방식 요청 - 요청 header에 담김 - 인터셉트가 일어날 
+		수 있다. : 문제점 : 노출 - URL - 보안취약 - 조회 @RequestBody - POST 방식 요청 - 단위테스트 불가함 
+		- 그러니까 postman으로 테스트가 가능함 : VO, Map 또는 원시형타입 모두 가능함 질문해보기 mem_no(member230324테이블)는 
+		어디서 가져오나요?? = 인증을 어디서 하나요??? = App.jsx 의 useEffect가 실행될 때 qna_type 즉 질문타입은 
+		상수로 양도를 줌 qna_secret 에는 비번을 입력 받음 비번이 넣이면 공개 널이 아니면 비공개 처리 가능한가??? 화면에서 가져올 
+		컬럼의 종류는 몇가지 인가요 세션이나 쿠키에서 또는 세션스토리지에서 가져와야 하는 컬럼이 있을까요??? 상수로 넣을 수 있는 (또는 
+		넣어야 하는) 컬럼이 존재하나요 만일 존재한다면 어떤 컬럼인지 말해보세요 하나 더 작성자는 입력받도록 화면을 그려야 할까요? 아니면 
+		자동으로 결정할 수 있는 건가요??? -->
+	<!-- <insert id="qnaInsert" parameterType="map" useGeneratedKeys="true" 
+		keyColumn="qna_bno" keyProperty="qna_bno"> INSERT INTO QNA ( qna_bno, mem_no, 
+		qna_title, qna_content, qna_type, qna_secret, qna_hit, qna_date ) VALUES 
+		( qna_seq.nextval, #{mem_no}, #{qna_title}, #{qna_content}, #{qna_type}, 
+		#{qna_secret}, 0, TO_CHAR(SYSDATE,'YYYY-MM-DD') ) </insert> -->
+	<insert id="qnaInsert" parameterType="map"
+		useGeneratedKeys="true" keyColumn="qna_bno" keyProperty="qna_bno">
+		INSERT INTO
+		QNA(
+		qna_bno,
+		mem_no,
+		qna_title,
+		qna_content,
+		qna_type,
+		qna_secret,
+		qna_hit,
+		qna_date
 		)
-		values(
+		VALUES(
 		qna_seq.nextval,
 		#{mem_no},
 		#{qna_title},
@@ -66,31 +96,69 @@
 		#{qna_type},
 		#{qna_secret},
 		0,
-		TO_CHAR
-		(SYSDATE,
-		'YYYY-MM-DD HH24:MI:SS')
+		to_char(SYSDATE,'YYYY-MM-DD')
 		)
 	</insert>
-	<!-- ==================================================================== -->
+	<!-- 이 쿼리문은 언제 어디서 왜 호출되야 할까 Controller,Logic,Dao에서 다 필요한경우 - 등록,글쓰기 Controller,Logic 
+		에서만 필요한 경우 - imageUpload Dao에서만 필요한 경우가 있다. -조회수 증가하기가 여기에 해당됨다 위치는? -> 언제 
+		조회수 증가함수를 호출해야 하나 qnaList와 qnaDetail을 나누길 잘했다 -->
+	<update id="qnaHit" parameterType="map">
+		<choose>
+			<when test='id.equals("notice")'>
+				UPDATE notice SET not_hit = not_hit +1
+				WHERE not_bno =
+				#{not_bno}
+			</when>
+			<when test='id.equals("qna")'>
+				UPDATE QNA SET qna_hit = qna_hit +1
+				WHERE qna_bno =
+				#{qna_bno}
+			</when>
+			<when test='id.equals("review")'>
+				UPDATE review SET rev_hit = rev_hit +1
+				WHERE rev_bno =
+				#{rev_bno}
+			</when>
+		</choose>
+	</update>
+	<update id="qnaUpdate">
+		UPDATE QNA
+		SET
+		<if test='qna_title!=null'> <!-- 조건검색시 사용 -->
+			QNA_TITLE =#{qna_title},
+		</if>
+		<if test='qna_content!=null'> <!-- 조건검색시 사용 -->
+			QNA_CONTENT =#{qna_content},
+		</if>
+		<if test='qna_type!=null'> <!-- 조건검색시 사용 -->
+			QNA_TYPE =#{qna_type},
+		</if>
+		<if test='qna_secert!=null'> <!-- 조건검색시 사용 -->
+			QNA_SECERT =#{qna_secert},
+		</if>
+			QNA_UPDDATE = TO_CHAR(SYSDATE,'YYYY-MM-DD')
+		WHERE QNA_BNO=#{qna_bno}
+	</update>
+	<!-- =========================================================== -->
 	<select id="fileList" parameterType="map" resultType="map">
-		SELECT file_name,file_size
+		SELECT
+		file_name, file_size
 		FROM mblog_file
 		WHERE qna_bno=#{qna_bno}
 	</select>
-
 	<insert id="fileInsert" parameterType="map">
 		INSERT INTO
-			mblog_file(file_no,file_path,file_name,file_size)
-		VALUES(mblog_file_seq.nextval,#{file_path}
-			,#{file_name},#{file_size})
+		MBLOG_FILE(file_no, file_path, file_name, file_size)
+		VALUES(mblog_file_seq.nextval, #{file_path}, #{file_name},
+		#{file_size})
 	</insert>
-	
 	<update id="fileUpdate" parameterType="list">
-	<foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close="; END;">
-		UPDATE MBLOG_FILE
-			SET board_type ='qna',
-				qna_bno =#{item.qna_bno}
-		WHERE file_name=LTRIM(#{item.file_name))
-	</foreach>
+		<foreach collection="list" item="item" separator=";"
+			open="DECLARE BEGIN" close="; END;">
+			UPDATE MBLOG_FILE
+			SET board_type ='QNA',
+			qna_bno = #{item.qna_bno}
+			WHERE file_name = LTRIM(#{item.file_name})
+		</foreach>
 	</update>
 </mapper>

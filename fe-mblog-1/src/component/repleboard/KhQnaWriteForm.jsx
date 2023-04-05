@@ -21,15 +21,6 @@ const KhQnAWriteForm = ({ authLogic }) => {
   const [files, setFiles] = useState([]); //파일처리
   const quillRef = useRef();
 
-  useEffect(() => {
-    for (let i = 0; i < files.length; i++) {
-      if (!content.match(files[i])) {
-        console.log(files);
-        setFiles(files.filter((file) => file != files[i]));
-      }
-    }
-  }, [content, setFiles, files]);
-
   const handleContent = useCallback((value) => {
     console.log(value);
     setContent(value);
@@ -37,39 +28,37 @@ const KhQnAWriteForm = ({ authLogic }) => {
 
   const handleFiles = useCallback(
     (value) => {
-      setFiles([...files, value]); //깊은복사
+      setFiles([...files, value]); //deep copy
     },
     [files]
-  );
+  ); //[m.png, m1.png, m2.png]
 
   const handleTitle = useCallback((e) => {
     setTitle(e);
   }, []);
-
   const handleTTitle = useCallback((e) => {
     setTTitle(e);
   }, []);
 
   const qnaInsert = async () => {
-    //post
+    // post
     console.log("qnaInsert");
-    console.log(secret);
-    console.log(typeof secret); //blooean 타입출력
+    console.log(secret); //true, 0아닌 것 모두
+    console.log(typeof secret); //boolean타입출력
     const board = {
       qna_title: title,
       qna_content: content,
-      qna_secret: secret ? "true" : "false", //문자열로
+      qna_secret: secret ? "true" : "false",
       qna_type: tTitle,
       mem_no: sessionStorage.getItem("no"),
       fileNames: files,
     }; //사용자가 입력한 값 넘기기 - @RequestBody로 처리됨
+    //insert here
     const res = await qnaInsertDB(board);
     console.log(res.data);
-    //성공시 페이지 이동처리
+    //성공시 페이지 이동처리하기
     window.location.replace("/qna/list?page=1");
-    // navigate("/qna/list");
   };
-
   return (
     <>
       <BlogHeader authLogic={authLogic} />
