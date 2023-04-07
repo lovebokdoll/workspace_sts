@@ -37,7 +37,7 @@ const BlogHeader = ({ authLogic }) => {
             <Link to="/dept/0" className="nav-link">
               부서관리
             </Link>
-            <Link to="/repleboard" className="nav-link">
+            <Link to="/reple/board" className="nav-link">
               게시판
             </Link>
           </Nav>

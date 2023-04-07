@@ -5,7 +5,7 @@ import BlogFooter from "../include/BlogFooter";
 import BlogHeader from "../include/BlogHeader";
 import RepleBoardList from "../repleboard/RepleBoardList";
 
-const RepleBoardPage = ({ board }) => {
+const RepleBoardPage = () => {
   const navigate = useNavigate();
   const boardSearch = () => {};
   return (

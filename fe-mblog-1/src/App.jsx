@@ -119,7 +119,7 @@ function App({ authLogic, imageUploader }) {
           <Route //
             path="/reple/board"
             exact={true}
-            element={<RepleBoardPage />}
+            element={<RepleBoardPage authLogic={authLogic} />}
           />
           <Route
             path="/qna/list"
