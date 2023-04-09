@@ -66,7 +66,7 @@ const KhQnAUpdatePage = () => {
     setTTitle(e);
   }, []);
 
-  const  boardUpdate= async () => {
+  const boardUpdate = async () => {
     if (title.trim() === "||content.trim()===")
       return console.log("게시글이 수정되지 않았습니다.");
     const board = {

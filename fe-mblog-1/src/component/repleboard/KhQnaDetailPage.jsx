@@ -10,7 +10,7 @@ import BlogHeader from "../include/BlogHeader";
 import BlogFooter from "../include/BlogFooter";
 import RepleBoardDetail from "./RepleBoardDetail";
 
-const KhQnaDetailPage = ({ authLogic }) => {
+const KhQnADetailPage = ({ authLogic }) => {
   const search = window.location.search;
   console.log(search);
   const page = search
@@ -111,4 +111,4 @@ const KhQnaDetailPage = ({ authLogic }) => {
   );
 };
 
-export default KhQnaDetailPage;
+export default KhQnADetailPage;
